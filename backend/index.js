@@ -1,0 +1,208 @@
+require("dotenv").config();
+const express = require("express");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const cookieParser = require("cookie-parser");
+const session = require("express-session");
+const MySQLStore = require("express-mysql-session")(session);
+const bcrypt = require("bcrypt");
+const cors = require("cors");
+const { pool, promisePool } = require("./db");
+const app = express();
+const PORT = 5000;
+const defaultSessionMaxAge = 60 * 60 * 1000;
+const rememberMeMaxAge = 24 * 60 * 60 * 1000;
+const bcryptRounds = Number(process.env.BCRYPT_ROUNDS);
+const sessionStore = new MySQLStore(
+  {
+    expiration: Number(24 * 60 * 60 * 1000),
+    createDatabaseTable: true,
+    schema: {
+      tableName: "sessions",
+      columnNames: {
+        session_id: "session_id",
+        expires: "expires",
+        data: "data",
+      },
+    },
+  },
+  pool
+);
+
+app.use(helmet());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+app.use(
+  session({
+    key: "sid",
+    secret: process.env.SESSION_SECRET,
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+    rolling: true,
+    cookie: {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: defaultSessionMaxAge,
+      domain: undefined,
+    },
+  })
+);
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Za duże obiążenie serwera, spróbuj ponownie",
+});
+
+async function getUserByEmail(email) {
+  const [rows] = await promisePool.query(
+    "SELECT id, email, password_hash FROM users WHERE email = ?",
+    [email]
+  );
+  return rows[0];
+}
+
+function requireAuth(req, res, next) {
+  if (req.session && req.session.userId) return next();
+  return res.status(401).json({ message: "Użytkownik niezalogowany" });
+}
+
+app.post("/api/auth/register", authLimiter, async (req, res) => {
+  try {
+    const { name, email, password, phone, state, postcode, city, address } =
+      req.body;
+
+    const existing = await getUserByEmail(email);
+    if (existing)
+      return res
+        .status(400)
+        .json({ message: "Ten Email jest już przypisany do Konta" });
+
+    const password_hash = await bcrypt.hash(password, bcryptRounds);
+    const firstName = name.split(" ")[0];
+    const lastName = name.split(" ")[1];
+    const [result] = await promisePool.query(
+      "INSERT INTO users (name, surname, email, password_hash, phone, county, postcode, city, adress) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [
+        firstName,
+        lastName,
+        email,
+        password_hash,
+        phone,
+        state,
+        postcode,
+        city,
+        address,
+      ]
+    );
+
+    return res.status(201).json({
+      message: "Stworzono Konto",
+      userId: result.insertId,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Błąd wewnętrzny serwera" });
+  }
+});
+
+app.post("/api/auth/login", authLimiter, async (req, res) => {
+  try {
+    const { email, password, remember_me } = req.body;
+    const user = await getUserByEmail(email);
+    if (!user)
+      return res.status(401).json({ message: "Niepoprawne Dane Logowania" });
+
+    const ok = await bcrypt.compare(password, user.password_hash);
+    if (!ok) {
+      return res.status(401).json({ message: "Niepoprawne Dane Logowania" });
+    }
+
+    req.session.regenerate((err) => {
+      if (err) {
+        console.error("Błąd Sesji", err);
+        return res.status(500).json({ message: "Błąd wewnętrzny serwera" });
+      }
+      req.session.userId = user.id;
+      req.session.email = user.email;
+      req.session.cookie.maxAge = remember_me
+        ? rememberMeMaxAge
+        : defaultSessionMaxAge;
+      return res.json({ message: "Zalogowano Pomyślnie" });
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Błąd wewnętrzny serwera" });
+  }
+});
+
+app.post("/api/auth/logout", async (req, res) => {
+  try {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Błąd Sesji", err);
+        return res.status(500).json({ message: "Błąd wewnętrzny serwera" });
+      }
+
+      res.clearCookie("sid", {
+        path: "/",
+        sameSite: "lax",
+        secure: false,
+        httpOnly: true,
+      });
+      return res.json({ message: "Wylogowano z Konta" });
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Błąd wewnętrzny serwera" });
+  }
+});
+
+app.get("/api/me", requireAuth, async (req, res) => {
+  try {
+    const [rows] = await promisePool.query(
+      "SELECT id, name, surname, email, role, phone, county, postcode, city, adress FROM users WHERE id = ?",
+      [req.session.userId]
+    );
+    if (!rows[0])
+      return res.status(404).json({ message: "Nie znaleziono Użytkownika" });
+
+    return res.json({ user: rows[0] });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Błąd wewnętrzny serwera" });
+  }
+});
+
+app.put("/api/user_update", requireAuth, async (req, res) => {
+  try {
+    const { id, name, surname, email, phone, county, postcode, city, adress } =
+      req.body;
+    const [result] = await promisePool.query(
+      `UPDATE users
+      SET name = ?, surname = ?, email = ?, phone = ?, county = ?, postcode = ?, city = ?, adress = ?
+      WHERE id = ?`,
+      [name, surname, email, phone, county, postcode, city, adress, id]
+    );
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Nie znaleziono Użytkownika" });
+    }
+    return res.json({ message: "Dane zaktualizowano pomyślnie" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Błąd wewnętrzny serwera" });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Backend running at http://localhost:${PORT}`);
+});
