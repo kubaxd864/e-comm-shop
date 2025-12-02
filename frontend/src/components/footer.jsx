@@ -16,7 +16,7 @@ export default function Footer() {
         bezpieczne zakupy. Dziękujemy za zaufanie i życzymy udanych zakupów!”
       </p>
       <ul className="flex flex-col gap-0.5">
-        <li>Nasz Punkty</li>
+        <li>Nasze Punkty</li>
         <li>Regulamin</li>
         <li>Polityka Prywatności</li>
         <li>Informacje Kontaktowe</li>

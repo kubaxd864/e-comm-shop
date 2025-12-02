@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "./UserProvider";
 import { useToast } from "./ToastProvider";
 import { useState } from "react";
+import { Switch } from "@mui/material";
 
 export default function Header() {
   const { user, refreshUser } = useUser();
@@ -51,7 +52,7 @@ export default function Header() {
             placeholder="Czego Szukasz?"
             className="w-full pl-12 rounded-l-lg pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-800"
           />
-          <button className="py-2 px-4 rounded-r-lg bg-blue-800 hover:bg-blue-900">
+          <button className="py-2 px-4 rounded-r-lg bg-blue-800 hover:bg-blue-700">
             Szukaj
           </button>
         </div>
@@ -80,7 +81,7 @@ export default function Header() {
           </Link>
           {user ? (
             <div
-              className={`absolute right-0 top-full mt-2 flex flex-col gap-5 rounded-sm border border-gray-700 bg-zinc-900 p-3 text-left text-sm transition-all duration-200 ease-out origin-top transform ${
+              className={`absolute right-0 top-full z-1000 mt-2 flex flex-col gap-5 rounded-sm border border-gray-700 bg-zinc-900 p-3 text-left text-sm transition-all duration-200 ease-out origin-top transform ${
                 openMenu
                   ? "scale-y-100 opacity-100 translate-y-0"
                   : "pointer-events-none scale-y-0 opacity-0 -translate-y-2"
@@ -88,6 +89,15 @@ export default function Header() {
               onMouseEnter={() => setOpenMenu(true)}
               onMouseLeave={() => setTimeout(() => setOpenMenu(false), 3000)}
             >
+              {" "}
+              <div>
+                <p className="font-bold">{user.email}</p>
+                <p className="font-bold">id: {user.id}</p>
+              </div>
+              <div className="flex flex-row justify-between">
+                <p className="flex justify-center items-center">Tryb: </p>
+                <Switch defaultChecked />
+              </div>
               {user.role === "admin" ? (
                 <Link href={"/admin_panel"}>
                   <p>Panel Administratora</p>
