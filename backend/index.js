@@ -226,13 +226,27 @@ app.get("/api/get_product/data/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await promisePool.query(
-      `SELECT p.name, p.description, p.item_condition, p.price, p.created_at, c.name AS category_name, c.slug AS category_slug, s.name AS shop_name, s.email AS shop_email, s.phone AS shop_phone, s.address AS shop_address, s.city AS shop_city, GROUP_CONCAT(img.file_path SEPARATOR '||') AS images 
+      `SELECT p.name, p.description, p.item_condition, p.price, p.created_at, c.id AS category_id, c.name AS category_name, c.slug AS category_slug, s.name AS shop_name, s.email AS shop_email, s.phone AS shop_phone, s.address AS shop_address, s.city AS shop_city, GROUP_CONCAT(img.file_path SEPARATOR '||') AS images 
       FROM products p LEFT JOIN product_images img ON img.product_id = p.id LEFT JOIN categories c ON c.id = p.category_id LEFT JOIN stores s ON s.id = p.store_id WHERE p.id = ?`,
       [id]
     );
     if (!rows[0])
       return res.status(404).json({ message: "Nie znaleziono produktu" });
     return res.json({ product: rows[0] });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Błąd podczas pobierania danych" });
+  }
+});
+
+app.get("/api/get_simular_products", async (req, res) => {
+  const { category_id, id } = req.query;
+  try {
+    const [rows] = await promisePool.query(
+      `SELECT p.id, p.name, p.price, img.file_path FROM products p LEFT JOIN product_images img ON img.product_id = p.id AND img.alt_text = 'Zdjęcie 1' WHERE p.category_id = ? AND p.id != ?`,
+      [category_id, id]
+    );
+    return res.json({ products: rows });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Błąd podczas pobierania danych" });

@@ -2,12 +2,16 @@ import ImageGalleryClient from "@/components/PictureSlider";
 import FavoriteBtn from "@/components/FavoriteButton";
 import CartBtn from "@/components/CartButton";
 import ProductDescription from "@/components/ProductDescription";
+import SimilarProd from "@/components/SimilarProdBox";
 import axios from "axios";
 import Link from "next/link";
 
 export default async function ProductPage({ params }) {
   const { id } = await params;
   const { product, galleryItems } = await ProductData();
+  const simularproducts = product
+    ? await SimularProducts(product.category_id, id)
+    : [];
   const images = galleryItems;
 
   async function ProductData() {
@@ -25,6 +29,20 @@ export default async function ProductPage({ params }) {
     } catch (err) {
       console.error(err);
       return { product: null, galleryItems: [] };
+    }
+  }
+
+  async function SimularProducts(category_id, id) {
+    try {
+      const res = await axios.get(
+        "http://localhost:5000/api/get_simular_products",
+        {
+          params: { category_id: category_id, id: id },
+        }
+      );
+      return res.data?.products;
+    } catch (err) {
+      console.error(err);
     }
   }
   return (
@@ -70,9 +88,23 @@ export default async function ProductPage({ params }) {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-8 text-center mb-10">
         <h1 className="text-3xl">Podobne Produkty</h1>
-        <div></div>
+        <div className="flex flex-row gap-5">
+          {simularproducts.length > 0 ? (
+            simularproducts.map((e) => (
+              <SimilarProd
+                key={e.id ?? e.name}
+                id={e.id}
+                name={e.name}
+                price={e.price}
+                thumbnail={e.file_path ?? e.thumbnail}
+              />
+            ))
+          ) : (
+            <p className="p-4">Nie znaleziono podobnych produktów</p>
+          )}
+        </div>
       </div>
     </main>
   );
