@@ -253,6 +253,71 @@ app.get("/api/get_simular_products", async (req, res) => {
   }
 });
 
+app.get("/api/favorites", requireAuth, async (req, res) => {
+  try {
+    const [rows] = await promisePool.query(
+      `SELECT p.id, p.name, p.price, p.item_condition, img.file_path thumbnail, s.address AS store_address, s.city AS store_city
+     FROM favorites f
+     JOIN products p ON p.id = f.product_id
+     LEFT JOIN product_images img
+     ON img.product_id = p.id AND img.alt_text = "Zdjęcie 1"
+     LEFT JOIN stores s
+     ON s.id = p.store_id
+     WHERE f.user_id = ?
+     ORDER BY f.created_at DESC`,
+      [req.session.userId]
+    );
+    return res.json({ favorites: rows });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Błąd podczas pobierania danych" });
+  }
+});
+
+app.post("/api/favorites/:productId", requireAuth, async (req, res) => {
+  try {
+    await promisePool.query(
+      `INSERT IGNORE INTO favorites (user_id, product_id) VALUES (?, ?)`,
+      [req.session.userId, req.params.productId]
+    );
+    return res.status(201).json({ message: "Dodano do Ulubionych" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Błąd podczas Dodawania" });
+  }
+});
+
+app.delete("/api/favorites/:productId", requireAuth, async (req, res) => {
+  try {
+    await promisePool.query(
+      `DELETE FROM favorites WHERE user_id = ? AND product_id = ?`,
+      [req.session.userId, req.params.productId]
+    );
+    return res.json({ message: "Usunięto z Ulubionych" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Błąd podczas Dodawania" });
+  }
+});
+
+app.get("/api/cart", requireAuth, async (req, res) => {
+  try {
+    const [rows] = await promisePool.query(
+      `SELECT p.id, p.name, p.price, img.file_path thumbnail,
+     FROM cart_items c
+     JOIN products p ON p.id = c.product_id
+     LEFT JOIN product_images img
+     ON img.product_id = p.id AND img.alt_text = "Zdjęcie 1"
+     WHERE c.user_id = ?`,
+      [req.session.userId]
+    );
+    return res.json({ cart_items: rows });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Błąd podczas pobierania danych" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Backend running at http://localhost:${PORT}`);
 });

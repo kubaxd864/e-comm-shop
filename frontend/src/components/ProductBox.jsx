@@ -54,7 +54,7 @@ export default function ProductBox({
         <div className="mt-auto flex flex-col gap-2">
           <p className="text-2xl text-right">{price} zł</p>
           <div className="flex flex-row justify-between">
-            <FavoriteBtn />
+            <FavoriteBtn productId={id} />
             <CartBtn />
           </div>
         </div>

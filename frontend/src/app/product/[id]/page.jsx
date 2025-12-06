@@ -2,7 +2,7 @@ import ImageGalleryClient from "@/components/PictureSlider";
 import FavoriteBtn from "@/components/FavoriteButton";
 import CartBtn from "@/components/CartButton";
 import ProductDescription from "@/components/ProductDescription";
-import SimilarProd from "@/components/SimilarProdBox";
+import SimilarProductsCarousel from "@/components/SimilarProdCarousel";
 import axios from "axios";
 import Link from "next/link";
 
@@ -55,8 +55,8 @@ export default async function ProductPage({ params }) {
           </Link>
           /<p>{product.name}</p>
         </div>
-        <div className="flex flex-row gap-8 p-2">
-          <div className="max-w-[600px]">
+        <div className="flex flex-col justify-center items-center lg:flex-row lg:items-start gap-8 p-2">
+          <div className="flex max-w-[600px]">
             <ImageGalleryClient items={images} />
           </div>
           <div className="flex flex-col gap-7 w-full px-6">
@@ -74,7 +74,7 @@ export default async function ProductPage({ params }) {
               <p className="text-sm">Liczba sztuk: 1</p>
             </div>
             <div className="flex flex-row justify-between">
-              <FavoriteBtn />
+              <FavoriteBtn productId={id} />
               <CartBtn />
             </div>
             <ProductDescription
@@ -88,23 +88,9 @@ export default async function ProductPage({ params }) {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-8 text-center mb-10">
+      <div className="flex flex-col gap-8 text-center mb-10 max-w-10/12">
         <h1 className="text-3xl">Podobne Produkty</h1>
-        <div className="flex flex-row gap-5">
-          {simularproducts.length > 0 ? (
-            simularproducts.map((e) => (
-              <SimilarProd
-                key={e.id ?? e.name}
-                id={e.id}
-                name={e.name}
-                price={e.price}
-                thumbnail={e.file_path ?? e.thumbnail}
-              />
-            ))
-          ) : (
-            <p className="p-4">Nie znaleziono podobnych produktów</p>
-          )}
-        </div>
+        <SimilarProductsCarousel items={simularproducts} />
       </div>
     </main>
   );

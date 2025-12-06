@@ -28,6 +28,28 @@ export default function ImageGalleryClient({ items }) {
           />
         </div>
       )}
+      renderThumbInner={(item) => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+          }}
+        >
+          <img
+            src={item.thumbnail || item.original}
+            alt={item.thumbnail || item.original}
+            style={{
+              width: "80px",
+              height: "80px",
+              objectFit: "contain",
+              backgroundColor: "white",
+              borderRadius: 6,
+            }}
+          />
+        </div>
+      )}
     />
   );
 }
