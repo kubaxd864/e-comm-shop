@@ -71,6 +71,23 @@ async function getUserByEmail(email) {
   return rows[0];
 }
 
+async function getOrCreateCart(userId) {
+  const [rows] = await promisePool.query(
+    "SELECT * FROM carts WHERE user_id = ?",
+    [userId]
+  );
+  if (rows.length > 0) return rows[0];
+  const [result] = await promisePool.query(
+    "INSERT INTO carts (user_id) VALUES (?)",
+    [userId]
+  );
+  const newCart = {
+    id: result.insertId,
+    userId,
+  };
+  return newCart;
+}
+
 function requireAuth(req, res, next) {
   if (req.session && req.session.userId) return next();
   return res.status(401).json({ message: "Użytkownik niezalogowany" });
@@ -226,7 +243,7 @@ app.get("/api/get_product/data/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await promisePool.query(
-      `SELECT p.name, p.description, p.item_condition, p.price, p.created_at, c.id AS category_id, c.name AS category_name, c.slug AS category_slug, s.name AS shop_name, s.email AS shop_email, s.phone AS shop_phone, s.address AS shop_address, s.city AS shop_city, GROUP_CONCAT(img.file_path SEPARATOR '||') AS images 
+      `SELECT p.name, p.description, p.item_condition, p.price, p.quantity, p.created_at, c.id AS category_id, c.name AS category_name, c.slug AS category_slug, s.name AS shop_name, s.email AS shop_email, s.phone AS shop_phone, s.address AS shop_address, s.city AS shop_city, GROUP_CONCAT(img.file_path SEPARATOR '||') AS images 
       FROM products p LEFT JOIN product_images img ON img.product_id = p.id LEFT JOIN categories c ON c.id = p.category_id LEFT JOIN stores s ON s.id = p.store_id WHERE p.id = ?`,
       [id]
     );
@@ -302,20 +319,132 @@ app.delete("/api/favorites/:productId", requireAuth, async (req, res) => {
 
 app.get("/api/cart", requireAuth, async (req, res) => {
   try {
-    const [rows] = await promisePool.query(
-      `SELECT p.id, p.name, p.price, img.file_path thumbnail,
-     FROM cart_items c
-     JOIN products p ON p.id = c.product_id
-     LEFT JOIN product_images img
-     ON img.product_id = p.id AND img.alt_text = "Zdjęcie 1"
-     WHERE c.user_id = ?`,
-      [req.session.userId]
+    const cart = await getOrCreateCart(req.session.userId);
+    const [items] = await promisePool.query(
+      `SELECT p.id,
+              p.name,
+              p.price,
+              c.quantity,
+              p.store_id,
+              p.size,
+              s.name AS store_name,
+              img.file_path AS thumbnail
+       FROM cart_items c
+       JOIN products p ON p.id = c.product_id
+       JOIN stores s ON s.id = p.store_id
+       LEFT JOIN product_images img
+         ON img.product_id = p.id AND img.alt_text = 'Zdjęcie 1'
+       WHERE c.cart_id = ?`,
+      [cart.id]
     );
-    return res.json({ cart_items: rows });
+    let itemsSum = 0;
+    let deliverySum = 0;
+
+    const map = items.reduce((acc, it) => {
+      const sid = it.store_id ?? it.storeId ?? 0;
+
+      if (!acc.has(sid)) {
+        acc.set(sid, {
+          store_id: sid,
+          store_name: it.store_name ?? it.shop_name ?? `Sklep ${sid}`,
+          items: [],
+          size: { width: 0, height: 0, length: 0, weight: 0 },
+          deliveryprice: 0,
+        });
+      }
+
+      const group = acc.get(sid);
+      itemsSum += it.quantity * it.price;
+      let parsedSize = JSON.parse(it.size);
+
+      if (parsedSize) {
+        group.size.width += parsedSize.width ?? 0;
+        group.size.height += parsedSize.height ?? 0;
+        group.size.length += parsedSize.length ?? 0;
+        group.size.weight += parsedSize.weight ?? 0;
+      }
+      group.items.push({
+        id: it.id,
+        name: it.name,
+        price: it.price,
+        quantity: it.quantity,
+        thumbnail: it.thumbnail,
+        store_id: sid,
+      });
+
+      return acc;
+    }, new Map());
+
+    const groups = [...map.values()].map((g) => ({
+      ...g,
+      items: [...g.items],
+    }));
+
+    console.log(groups);
+    return res.json({
+      items: items,
+      groupedByStore: groups,
+      itemsSum,
+      deliverySum,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Błąd podczas pobierania danych" });
   }
+});
+
+app.post("/api/cart/:productId", requireAuth, async (req, res) => {
+  const { productId } = req.params;
+  const cart = await getOrCreateCart(req.session.userId);
+  const [stockRows] = await promisePool.query(
+    "SELECT quantity AS stock FROM products WHERE id = ? FOR UPDATE",
+    [productId]
+  );
+  const [existingRows] = await promisePool.query(
+    "SELECT id, quantity FROM cart_items WHERE cart_id = ? AND product_id = ? FOR UPDATE",
+    [cart.id, productId]
+  );
+  const stock = Number(stockRows[0].stock);
+  const quantity = Number(existingRows[0]?.quantity ?? 0);
+  if (quantity + 1 > stock) {
+    return res.status(400).json({ message: "Maksymalna ilość Produktu" });
+  }
+  if (quantity > 0) {
+    await promisePool.query(
+      "UPDATE cart_items SET quantity = quantity + ? WHERE id = ?",
+      [1, existingRows[0].id]
+    );
+  } else {
+    await promisePool.query(
+      "INSERT INTO cart_items (cart_id, product_id, quantity) VALUES (?, ?, ?)",
+      [cart.id, productId, 1]
+    );
+  }
+  res.json({ message: "Dodano do koszyka" });
+});
+
+app.post(
+  "/api/cart/lowerquantity/:productId",
+  requireAuth,
+  async (req, res) => {
+    const { productId } = req.params;
+    const cart = await getOrCreateCart(req.session.userId);
+    await promisePool.query(
+      "UPDATE cart_items SET quantity = quantity - ? WHERE cart_id = ? AND product_id = ?",
+      [1, cart.id, productId]
+    );
+    res.json({ message: "Zmniejszono Ilość" });
+  }
+);
+
+app.delete("/api/cart/:productId", requireAuth, async (req, res) => {
+  const { productId } = req.params;
+  const cart = await getOrCreateCart(req.session.userId);
+  await promisePool.query(
+    "DELETE FROM cart_items WHERE cart_id = ? AND product_id = ?",
+    [cart.id, productId]
+  );
+  res.json({ message: "Usunięto z koszyka" });
 });
 
 app.listen(PORT, () => {

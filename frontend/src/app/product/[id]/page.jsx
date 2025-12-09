@@ -1,6 +1,6 @@
 import ImageGalleryClient from "@/components/PictureSlider";
 import FavoriteBtn from "@/components/FavoriteButton";
-import CartBtn from "@/components/CartButton";
+import CartBtn from "@/components/AddCartButton";
 import ProductDescription from "@/components/ProductDescription";
 import SimilarProductsCarousel from "@/components/SimilarProdCarousel";
 import axios from "axios";
@@ -71,11 +71,11 @@ export default async function ProductPage({ params }) {
             </div>
             <div className="flex flex-col gap-2.5">
               <p className="text-4xl">{product.price} zł</p>
-              <p className="text-sm">Liczba sztuk: 1</p>
+              <p className="text-sm">Liczba sztuk: {product.quantity}</p>
             </div>
             <div className="flex flex-row justify-between">
               <FavoriteBtn productId={id} />
-              <CartBtn />
+              <CartBtn productId={id} />
             </div>
             <ProductDescription
               description={product.description}
@@ -90,7 +90,13 @@ export default async function ProductPage({ params }) {
       </div>
       <div className="flex flex-col gap-8 text-center mb-10 max-w-10/12">
         <h1 className="text-3xl">Podobne Produkty</h1>
-        <SimilarProductsCarousel items={simularproducts} />
+        {simularproducts.length !== 0 ? (
+          <SimilarProductsCarousel items={simularproducts} />
+        ) : (
+          <div>
+            <p>Nie znaleziono Podobnych Produktów</p>
+          </div>
+        )}
       </div>
     </main>
   );

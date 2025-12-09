@@ -18,9 +18,9 @@ export default function Home() {
         setProducts(res.data.products);
       })
       .catch((err) => {
-        addToast(err.response?.data.message, "error");
+        addToast(err.response?.data.message || "Błąd Bazy danych", "error");
       });
-  }, [addToast]);
+  }, []);
 
   return (
     <main className="flex flex-1 w-full flex-col gap-9 bg-white text-center dark:bg-black">

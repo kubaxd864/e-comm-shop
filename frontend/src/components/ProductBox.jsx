@@ -3,7 +3,7 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faCamera } from "@fortawesome/free-regular-svg-icons";
 import FavoriteBtn from "./FavoriteButton";
-import CartBtn from "./CartButton";
+import CartBtn from "./AddCartButton";
 
 export default function ProductBox({
   id,
@@ -55,7 +55,7 @@ export default function ProductBox({
           <p className="text-2xl text-right">{price} zł</p>
           <div className="flex flex-row justify-between">
             <FavoriteBtn productId={id} />
-            <CartBtn />
+            <CartBtn productId={id} />
           </div>
         </div>
       </div>

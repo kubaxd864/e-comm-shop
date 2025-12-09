@@ -1,6 +1,6 @@
 import Link from "next/link";
 import FavoriteBtn from "./FavoriteButton";
-import CartBtn from "./CartButton";
+import CartBtn from "./AddCartButton";
 
 export default function SimilarProd({ id, name, price, thumbnail }) {
   return (
@@ -19,8 +19,8 @@ export default function SimilarProd({ id, name, price, thumbnail }) {
       </Link>
       <p className="text-sm text-zinc-400">{price}</p>
       <div className="flex flex-row justify-between w-full p-2">
-        <FavoriteBtn />
-        <CartBtn />
+        <FavoriteBtn productId={id} />
+        <CartBtn productId={id} />
       </div>
     </div>
   );
