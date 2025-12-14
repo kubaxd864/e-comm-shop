@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import axios from "axios";
 import { useToast } from "@/components/ToastProvider";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 const fetcher = (url) =>
   axios.get(url, { withCredentials: true }).then((res) => res.data);
@@ -15,7 +15,27 @@ export function useCart() {
       revalidateOnFocus: false,
     }
   );
-  const { items, groupedByStore, itemsSum, deliverySum } = data ?? {};
+  const items = useMemo(() => data?.items ?? [], [data]);
+  const groupedByStore = useMemo(() => data?.groupedByStore ?? [], [data]);
+  const itemsSum = useMemo(() => data?.itemsSum ?? 0, [data]);
+  const deliverySum = useMemo(() => data?.deliverySum ?? 0, [data]);
+  const deliverySelections = useMemo(
+    () => data?.deliverySelections ?? 0,
+    [data]
+  );
+
+  async function UpdateDeliveryPrice(storeId, newPrice) {
+    await axios.post(
+      "http://localhost:5000/api/cart/delivery",
+      {
+        storeId,
+        price: newPrice,
+      },
+      { withCredentials: true }
+    );
+
+    await mutate();
+  }
 
   async function addToCart(productId) {
     try {
@@ -69,8 +89,10 @@ export function useCart() {
     groupedByStore,
     itemsSum,
     deliverySum,
+    deliverySelections,
     isLoading,
     error,
+    UpdateDeliveryPrice,
     addToCart,
     lowerQuantity,
     deleteFromCart,

@@ -19,6 +19,8 @@
     "@fortawesome/react-fontawesome": "^3.1.0",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.5",
+    "@stripe/react-stripe-js": "^5.4.1",
+    "@stripe/stripe-js": "^8.5.3",
     "axios": "^1.13.2",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",

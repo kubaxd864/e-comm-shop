@@ -1,49 +1,59 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useToast } from "@/components/ToastProvider";
 import UserData from "@/components/UserDataForm";
-import Summary from "@/components/Summary";
 import DeliveryOptions from "@/components/DeliveryOptions";
+import Summary from "@/components/Summary";
 import Payment from "@/components/Payment";
+import axios from "axios";
+import { useUser } from "@/components/UserProvider";
 
 export default function CheckoutForm() {
   const methods = useForm();
+  const { user, refreshUser } = useUser();
+  const { addToast } = useToast();
   const [step, setStep] = useState(1);
-  const submit = (data) => {
+
+  const submit = async (data) => {
+    sessionStorage.setItem("checkoutData", JSON.stringify(data));
+
     if (data.save_data) {
-      console.log("Zapisano do bazy");
+      try {
+        const res = await axios.put(
+          "/api/user_update",
+          { id: user.id, county: user.county, ...data },
+          { withCredentials: true }
+        );
+        addToast(res.data?.message ?? "Dane zapisane", "success");
+        await refreshUser();
+      } catch (err) {
+        addToast("Błąd zapisu danych", "error");
+        return;
+      }
     }
-    console.log(data);
+
     setStep((prev) => prev + 1);
-    if (step === 3) {
-      console.log("Złożono Zamówienie");
-    }
   };
 
   return (
     <main className="flex flex-1 w-full justify-center bg-white dark:bg-black">
-      <div className="flex flex-col w-9/12 m-10 items-center gap-9">
-        <h1 className="text-3xl font-bold text-center">
+      <div className="w-9/12 mt-10">
+        <h1 className="text-3xl text-center mb-8">
           {step === 1
             ? "Dane Zamówienia"
             : step === 2
             ? "Opcje Wysyłki"
-            : "Metoda Płatności"}
+            : "Płatność"}
         </h1>
+
         <FormProvider {...methods}>
-          <form
-            onSubmit={methods.handleSubmit(submit)}
-            className="flex flex-row gap-5 w-full"
-          >
-            {step === 1 ? (
-              <UserData modified={methods.formState.isDirty} />
-            ) : step === 2 ? (
-              <DeliveryOptions />
-            ) : (
-              <Payment />
-            )}
-            <Summary step={step} setStep={setStep} />
+          <form onSubmit={methods.handleSubmit(submit)} className="flex gap-6">
+            {step === 1 && <UserData />}
+            {step === 2 && <DeliveryOptions />}
+            {step === 3 && <Payment setStep={setStep} />}
+
+            {step !== 3 ? <Summary step={step} setStep={setStep} /> : null}
           </form>
         </FormProvider>
       </div>

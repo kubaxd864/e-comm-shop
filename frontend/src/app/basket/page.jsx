@@ -25,8 +25,8 @@ export default function Basket() {
           <div className="flex flex-row gap-4 w-full justify-center">
             <div className="flex flex-col gap-4">
               {groupedByStore.map((el, idx) => (
-                <div key={idx} className="flex flex-col gap-1 bg-zinc-900">
-                  <p className="p-3 pb-0">Przesyłka od {el.store_name}</p>
+                <div key={idx} className="flex flex-col gap-1 p-4 bg-zinc-900">
+                  <p className="">Przesyłka od {el.store_name}</p>
                   {el.items.map((el, idx) => (
                     <CartItem
                       key={idx}
@@ -37,20 +37,20 @@ export default function Basket() {
                       thumbnail={el.thumbnail}
                     />
                   ))}
-                  <p className="p-3 text-right border-t-[1.5px] border-t-gray-400">
-                    Dostawa od:{" "}
+                  <p className="pt-2 p-1 text-right border-t-[1.5px] border-t-gray-400">
+                    Dostawa od: {el.cheapestdelivery} zł
                   </p>
                 </div>
               ))}
             </div>
-            <div className="flex flex-col h-fit w-[25%] gap-2 bg-zinc-900 rounded-sm p-4">
+            <div className="flex flex-col h-fit w-[25%] min-w-72 gap-2 bg-zinc-900 rounded-sm p-4">
               <div className="flex flex-row w-full justify-between">
                 <p>Wartość produktów:</p>
                 <p>{itemsSum.toFixed(2)} zł</p>
               </div>
               <div className="flex flex-row w-full justify-between">
                 <p>Dostawa od:</p>
-                <p>{deliverySum} zł</p>
+                <p>{deliverySum.toFixed(2)} zł</p>
               </div>
               <div className="flex flex-row w-full justify-between border-t-[1.5px] border-gray-400 pt-5">
                 <p className="flex justify-center items-center">

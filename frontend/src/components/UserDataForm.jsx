@@ -8,18 +8,38 @@ export default function UserData({ modified }) {
   const { user } = useUser();
   const [invoice, setInvoice] = useState(false);
   const { register, unregister, setValue, formState } = useFormContext();
-
   useEffect(() => {
-    if (user) {
+    const saved = sessionStorage.getItem("checkoutData");
+    if (saved) {
+      const data = JSON.parse(saved);
+      setValue("name", data.name);
+      setValue("surname", data.surname);
+      setValue("adress", data.adress);
+      setValue("postcode", data.postcode);
+      setValue("city", data.city);
+      setValue("email", data.email);
+      setValue("phone", data.phone);
+      if (data.invoice) {
+        setValue("company_name", data.company_name);
+        setValue("nip_number", data.nip_number);
+        setValue("company_address", data.company_address);
+        setValue("country", data.company_city);
+        setValue("company_postcode", data.company_postcode);
+        setValue("company_city", data.company_city);
+      }
+    }
+    if (user && !saved) {
       setValue("name", user.name);
       setValue("surname", user.surname);
-      setValue("address", user.adress);
+      setValue("adress", user.adress);
       setValue("postcode", user.postcode);
       setValue("city", user.city);
       setValue("email", user.email);
       setValue("phone", user.phone);
     }
+  }, [user, setValue, unregister]);
 
+  useEffect(() => {
     if (!invoice) {
       unregister([
         "company_name",
@@ -30,7 +50,7 @@ export default function UserData({ modified }) {
         "company_city",
       ]);
     }
-  }, [user, invoice, setValue, unregister]);
+  }, [invoice, unregister]);
 
   return (
     <div className="flex flex-col gap-3 p-8 bg-zinc-900 rounded-sm w-3/4">
@@ -72,7 +92,7 @@ export default function UserData({ modified }) {
       </div>
       <div className="flex flex-col gap-1 w-full">
         <input
-          {...register("address", {
+          {...register("adress", {
             required: "To pole jest wymagane",
             minLength: { value: 8, message: "Za krótki adres zamieszkania" },
           })}

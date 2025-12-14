@@ -7,11 +7,20 @@ const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
 const bcrypt = require("bcrypt");
 const cors = require("cors");
+const Stripe = require("stripe");
 const { pool, promisePool } = require("./db");
+const {
+  getUserByEmail,
+  getOrCreateCart,
+  buildCartSummary,
+  calculateDeliverySum,
+  requireAuth,
+} = require("./functions");
 const app = express();
 const PORT = 5000;
 const defaultSessionMaxAge = 60 * 60 * 1000;
 const rememberMeMaxAge = 24 * 60 * 60 * 1000;
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const bcryptRounds = Number(process.env.BCRYPT_ROUNDS);
 const sessionStore = new MySQLStore(
   {
@@ -62,36 +71,6 @@ const authLimiter = rateLimit({
   max: 100,
   message: "Za duże obiążenie serwera, spróbuj ponownie",
 });
-
-async function getUserByEmail(email) {
-  const [rows] = await promisePool.query(
-    "SELECT id, email, password_hash FROM users WHERE email = ?",
-    [email]
-  );
-  return rows[0];
-}
-
-async function getOrCreateCart(userId) {
-  const [rows] = await promisePool.query(
-    "SELECT * FROM carts WHERE user_id = ?",
-    [userId]
-  );
-  if (rows.length > 0) return rows[0];
-  const [result] = await promisePool.query(
-    "INSERT INTO carts (user_id) VALUES (?)",
-    [userId]
-  );
-  const newCart = {
-    id: result.insertId,
-    userId,
-  };
-  return newCart;
-}
-
-function requireAuth(req, res, next) {
-  if (req.session && req.session.userId) return next();
-  return res.status(401).json({ message: "Użytkownik niezalogowany" });
-}
 
 app.post("/api/auth/register", authLimiter, async (req, res) => {
   try {
@@ -337,60 +316,31 @@ app.get("/api/cart", requireAuth, async (req, res) => {
        WHERE c.cart_id = ?`,
       [cart.id]
     );
-    let itemsSum = 0;
-    let deliverySum = 0;
 
-    const map = items.reduce((acc, it) => {
-      const sid = it.store_id ?? it.storeId ?? 0;
+    const deliverySelections = req.session.deliverySelections ?? {};
+    const { groups, itemsSum } = await buildCartSummary(items);
+    const deliverySum = calculateDeliverySum(groups, deliverySelections);
 
-      if (!acc.has(sid)) {
-        acc.set(sid, {
-          store_id: sid,
-          store_name: it.store_name ?? it.shop_name ?? `Sklep ${sid}`,
-          items: [],
-          size: { width: 0, height: 0, length: 0, weight: 0 },
-          deliveryprice: 0,
-        });
-      }
-
-      const group = acc.get(sid);
-      itemsSum += it.quantity * it.price;
-      let parsedSize = JSON.parse(it.size);
-
-      if (parsedSize) {
-        group.size.width += parsedSize.width ?? 0;
-        group.size.height += parsedSize.height ?? 0;
-        group.size.length += parsedSize.length ?? 0;
-        group.size.weight += parsedSize.weight ?? 0;
-      }
-      group.items.push({
-        id: it.id,
-        name: it.name,
-        price: it.price,
-        quantity: it.quantity,
-        thumbnail: it.thumbnail,
-        store_id: sid,
-      });
-
-      return acc;
-    }, new Map());
-
-    const groups = [...map.values()].map((g) => ({
-      ...g,
-      items: [...g.items],
-    }));
-
-    console.log(groups);
     return res.json({
       items: items,
       groupedByStore: groups,
       itemsSum,
       deliverySum,
+      deliverySelections,
     });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Błąd podczas pobierania danych" });
   }
+});
+
+app.post("/api/cart/delivery", requireAuth, (req, res) => {
+  const { storeId, price, method } = req.body;
+  if (!req.session.deliverySelections) {
+    req.session.deliverySelections = {};
+  }
+  req.session.deliverySelections[storeId] = { price, method };
+  res.json({ success: true });
 });
 
 app.post("/api/cart/:productId", requireAuth, async (req, res) => {
@@ -445,6 +395,25 @@ app.delete("/api/cart/:productId", requireAuth, async (req, res) => {
     [cart.id, productId]
   );
   res.json({ message: "Usunięto z koszyka" });
+});
+
+app.get("/api/stripe_config", requireAuth, (req, res) => {
+  res.send({ publishablekey: process.env.STRIPE_PUBLIC_KEY });
+});
+
+app.post("/api/stripe/create-payment-intent", requireAuth, async (req, res) => {
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      currency: "pln",
+      amount: 1999,
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
+    res.send({ clientSecret: paymentIntent.client_secret });
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 app.listen(PORT, () => {
