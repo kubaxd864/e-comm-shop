@@ -1,86 +1,72 @@
 import useSWR from "swr";
-import axios from "axios";
+import api from "@/lib/axios";
 import { useToast } from "@/components/ToastProvider";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo } from "react";
+import { useUser } from "@/components/UserProvider";
 
-const fetcher = (url) =>
-  axios.get(url, { withCredentials: true }).then((res) => res.data);
+const fetcher = (url) => api.get(url).then((res) => res.data);
 
 export function useCart() {
+  const { user } = useUser();
   const { addToast } = useToast();
   const { data, error, mutate, isLoading } = useSWR(
-    "http://localhost:5000/api/cart",
+    !!user ? "http://localhost:5000/api/cart" : null,
     fetcher,
     {
       revalidateOnFocus: false,
+      shouldRetryOnError: false,
     }
   );
+
   const items = useMemo(() => data?.items ?? [], [data]);
   const groupedByStore = useMemo(() => data?.groupedByStore ?? [], [data]);
   const itemsSum = useMemo(() => data?.itemsSum ?? 0, [data]);
   const deliverySum = useMemo(() => data?.deliverySum ?? 0, [data]);
   const deliverySelections = useMemo(
-    () => data?.deliverySelections ?? 0,
+    () => data?.deliverySelections ?? {},
     [data]
   );
 
-  async function UpdateDeliveryPrice(storeId, newPrice) {
-    await axios.post(
+  async function updateDeliveryPrice(storeId, newPrice) {
+    await api.post(
       "http://localhost:5000/api/cart/delivery",
-      {
-        storeId,
-        price: newPrice,
-      },
+      { storeId, price: newPrice },
       { withCredentials: true }
     );
-
-    await mutate();
+    mutate();
   }
 
   async function addToCart(productId) {
     try {
-      const res = await axios.post(
-        `http://localhost:5000/api/cart/${productId}`,
-        {},
-        {
-          withCredentials: true,
-        }
-      );
-      await mutate();
+      const res = await api.post(`http://localhost:5000/api/cart/${productId}`);
+      mutate();
       addToast(res.data.message, "info");
     } catch (err) {
-      addToast(err.response.data.message, "error");
+      !!user ? addToast(err.response?.data?.message ?? "Błąd", "error") : null;
     }
   }
 
   async function lowerQuantity(productId) {
     try {
-      const res = await axios.post(
-        `http://localhost:5000/api/cart/lowerquantity/${productId}`,
-        {},
-        {
-          withCredentials: true,
-        }
+      const res = await api.post(
+        `http://localhost:5000/api/cart/lowerquantity/${productId}`
       );
-      await mutate();
+      mutate();
       addToast(res.data.message, "info");
     } catch (err) {
-      addToast(err.response.data.message, "error");
+      addToast(err.response?.data?.message ?? "Błąd", "error");
     }
   }
 
   async function deleteFromCart(productId) {
     try {
-      const res = await axios.delete(
-        `http://localhost:5000/api/cart/${productId}`,
-        {
-          withCredentials: true,
-        }
+      const res = await api.delete(
+        `http://localhost:5000/api/cart/${productId}`
       );
-      await mutate();
+      mutate();
       addToast(res.data.message, "info");
     } catch (err) {
-      addToast(err.response.data.message, "error");
+      addToast(err.response?.data?.message ?? "Błąd", "error");
     }
   }
 
@@ -92,7 +78,7 @@ export function useCart() {
     deliverySelections,
     isLoading,
     error,
-    UpdateDeliveryPrice,
+    updateDeliveryPrice,
     addToCart,
     lowerQuantity,
     deleteFromCart,

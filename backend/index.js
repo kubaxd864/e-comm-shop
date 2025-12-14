@@ -115,8 +115,9 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
   try {
     const { email, password, remember_me } = req.body;
     const user = await getUserByEmail(email);
-    if (!user)
+    if (!user) {
       return res.status(401).json({ message: "Niepoprawne Dane Logowania" });
+    }
 
     const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) {
@@ -202,14 +203,16 @@ app.put("/api/user_update", requireAuth, async (req, res) => {
 app.get("/api/get_products", async (req, res) => {
   try {
     const [rows] = await promisePool.query(
-      `SELECT p.id, p.name, p.price, p.item_condition, img.file_path AS thumbnail, s.address AS store_address, s.city AS store_city
-       FROM products p
+      `SELECT p.id, p.name, p.price, p.item_condition,
+       img.file_path AS thumbnail,
+       s.address AS store_address, s.city AS store_city
+        FROM products p
        LEFT JOIN product_images img
-         ON img.product_id = p.id
-        AND img.alt_text = "Zdjęcie 1"
+        ON img.product_id = p.id AND img.alt_text = 'Zdjęcie 1'
        LEFT JOIN stores s
-         ON s.id = p.store_id
-       LIMIT 20 OFFSET 0`
+        ON s.id = p.store_id
+       WHERE p.is_active = 'true'
+       LIMIT 20 OFFSET 0;`
     );
     return res.json({ products: rows });
   } catch (err) {
@@ -292,7 +295,7 @@ app.delete("/api/favorites/:productId", requireAuth, async (req, res) => {
     return res.json({ message: "Usunięto z Ulubionych" });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Błąd podczas Dodawania" });
+    return res.status(500).json({ message: "Błąd podczas Usuwania" });
   }
 });
 
@@ -402,10 +405,11 @@ app.get("/api/stripe_config", requireAuth, (req, res) => {
 });
 
 app.post("/api/stripe/create-payment-intent", requireAuth, async (req, res) => {
+  const { amount } = req.body;
   try {
     const paymentIntent = await stripe.paymentIntents.create({
       currency: "pln",
-      amount: 1999,
+      amount: amount,
       automatic_payment_methods: {
         enabled: true,
       },
@@ -413,6 +417,74 @@ app.post("/api/stripe/create-payment-intent", requireAuth, async (req, res) => {
     res.send({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
     console.error(err);
+  }
+});
+
+app.post("/api/make_order", requireAuth, async (req, res) => {
+  const { items, itemsSum, deliverySum } = req.body;
+  const amount = itemsSum + deliverySum;
+  try {
+    req.session.deliverySelections = {};
+    const [order] = await promisePool.query(
+      "INSERT INTO orders (user_id, total_amount) VALUES (?, ?)",
+      [req.session.userId, amount.toFixed(2)]
+    );
+    const values = items.map((item) => [
+      order.insertId,
+      item.id,
+      item.quantity,
+      item.price,
+    ]);
+    await promisePool.query(
+      "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ?",
+      [values]
+    );
+    await promisePool.query("DELETE FROM carts WHERE user_id = ?", [
+      req.session.userId,
+    ]);
+    const ids = items.map((item) => item.id);
+    await promisePool.query(
+      "UPDATE products SET is_active = 'false' WHERE id IN (?)",
+      [ids]
+    );
+    res.status(200).json({ message: "Złożono zamówienie" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Błąd podczas dokonywania zamówienia" });
+  }
+});
+
+app.get("/api/my_orders", requireAuth, async (req, res) => {
+  try {
+    const [orders] = await promisePool.query(
+      "SELECT o.id, o.total_amount, o.status, o.created_at FROM orders o WHERE user_id = ?",
+      [req.session.userId]
+    );
+    if (!orders.length) return res.json({ orders: [] });
+
+    const orderIds = orders.map((o) => o.id);
+    const [items] = await promisePool.query(
+      `SELECT oi.order_id, oi.product_id, oi.quantity, oi.price, p.name AS product_name, img.file_path AS thumbnail
+       FROM order_items oi
+       JOIN products p ON p.id = oi.product_id
+       LEFT JOIN product_images img ON img.product_id = p.id AND img.alt_text = 'Zdjęcie 1'
+       WHERE oi.order_id IN (?)`,
+      [orderIds]
+    );
+
+    const itemsByOrder = items.reduce((acc, it) => {
+      (acc[it.order_id] = acc[it.order_id] || []).push(it);
+      return acc;
+    }, {});
+
+    const ordersWithItems = orders.map((o) => ({
+      ...o,
+      items: itemsByOrder[o.id] ?? [],
+    }));
+    res.json({ orders: ordersWithItems });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Błąd podczas pobierania zamówień" });
   }
 });
 

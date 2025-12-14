@@ -7,6 +7,7 @@ export default function Basket() {
   const { items, groupedByStore, itemsSum, deliverySum, isLoading, error } =
     useCart();
   const router = useRouter();
+
   return (
     <main className="flex flex-1 w-full justify-center bg-white dark:bg-black">
       <div className="flex flex-col w-10/12 m-10 items-center gap-9">

@@ -6,12 +6,16 @@ import {
 } from "@stripe/react-stripe-js";
 import { useState } from "react";
 import { useCart } from "@/hooks/useCart";
+import api from "@/lib/axios";
+import { useRouter } from "next/navigation";
 
 export default function PaymentForm({ setStep }) {
   const stripe = useStripe();
   const elements = useElements();
+  const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
-  const { itemsSum, deliverySum } = useCart();
+  const { items, itemsSum, deliverySum } = useCart();
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handlePay = async () => {
     if (!stripe || !elements) return;
@@ -20,16 +24,28 @@ export default function PaymentForm({ setStep }) {
 
     const { error } = await stripe.confirmPayment({
       elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/completion`,
-      },
+      redirect: "if_required",
     });
 
     if (error) {
-      console.error(error.message);
+      setErrorMessage(error.message);
+      setIsProcessing(false);
+      return;
     }
-
-    setIsProcessing(false);
+    try {
+      const res = await api.post(
+        "http://localhost:5000/api/make_order",
+        { items, itemsSum, deliverySum },
+        { withCredentials: true }
+      );
+      sessionStorage.removeItem("checkoutData");
+    } catch (err) {
+      console.log(err);
+      return;
+    } finally {
+      setIsProcessing(false);
+    }
+    router.push("/completion");
   };
 
   return (
@@ -62,7 +78,11 @@ export default function PaymentForm({ setStep }) {
             disabled={isProcessing}
             className="bg-blue-600 py-3 rounded"
           >
-            {isProcessing ? "Przetwarzanie…" : "Zapłać"}
+            {isProcessing
+              ? "Przetwarzanie…"
+              : errorMessage !== ""
+              ? errorMessage
+              : "Zapłać"}
           </button>
           <button
             type="button"

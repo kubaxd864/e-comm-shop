@@ -7,7 +7,7 @@ export default function DeliveryOptions() {
     deliverySelections,
     isLoading,
     error,
-    UpdateDeliveryPrice,
+    updateDeliveryPrice,
   } = useCart();
   const { register } = useFormContext();
   return (
@@ -47,7 +47,7 @@ export default function DeliveryOptions() {
                                 Number(e.grossPriceTotal)
                           }
                           onChange={() =>
-                            UpdateDeliveryPrice(
+                            updateDeliveryPrice(
                               store.store_id,
                               e.grossPriceTotal
                             )
