@@ -11,7 +11,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useUser } from "./UserProvider";
 import { useToast } from "./ToastProvider";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Switch } from "@mui/material";
 
 export default function Header() {
@@ -19,6 +19,7 @@ export default function Header() {
   const { addToast } = useToast();
   const [openMenu, setOpenMenu] = useState(false);
   const router = useRouter();
+  const nameInput = useRef(null);
 
   async function logout() {
     try {
@@ -35,6 +36,13 @@ export default function Header() {
       addToast(err.response?.data?.message, "error");
     }
   }
+
+  function searchByName() {
+    const name = nameInput.current?.value?.trim();
+    if (!name) return;
+    router.push(`/categories?name=${name}`);
+  }
+
   return (
     <header className="flex justify-center w-full h-24 p-6 bg-zinc-950">
       <div className="flex flex-row justify-center items-center gap-8 w-full max-w-[1440px] mx-auto">
@@ -47,12 +55,16 @@ export default function Header() {
             className="absolute left-3 top-2.5 text-gray-400 w-5"
           />
           <input
+            ref={nameInput}
             type="text"
             id="searchBar"
             placeholder="Czego Szukasz?"
             className="w-full pl-12 rounded-l-lg pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-800"
           />
-          <button className="py-2 px-4 rounded-r-lg bg-blue-800 hover:bg-blue-700">
+          <button
+            onClick={() => searchByName()}
+            className="py-2 px-4 rounded-r-lg bg-blue-800 hover:bg-blue-700"
+          >
             Szukaj
           </button>
         </div>

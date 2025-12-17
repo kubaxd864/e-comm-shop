@@ -1,9 +1,11 @@
 "use client";
 import { useState } from "react";
 import { format, parseISO } from "date-fns";
+import { useRouter } from "next/navigation";
 
 export default function ProductDescription({
   description,
+  shop_id,
   shop_address,
   shop_city,
   shop_phone,
@@ -11,6 +13,12 @@ export default function ProductDescription({
   created_at,
 }) {
   const [openedSection, setSection] = useState("Opis");
+  const router = useRouter();
+
+  function SameStoreProducts(shopId) {
+    if (!shopId) return;
+    router.push(`/categories?shop=${shopId}`);
+  }
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-row gap-3 pb-1">
@@ -71,7 +79,10 @@ export default function ProductDescription({
           <p className="text-sm">Telefon: {shop_phone}</p>
           <p className="text-sm">Email: {shop_email}</p>
           <p className="text-sm">Godziny Otwarcia: 10-18</p>
-          <button className="bg-blue-800 text-sm px-6 py-3 mt-1 rounded-sm cursor-pointer hover:bg-blue-700">
+          <button
+            onClick={() => SameStoreProducts(shop_id)}
+            className="bg-blue-800 text-sm px-6 py-3 mt-1 rounded-sm cursor-pointer hover:bg-blue-700"
+          >
             Inne Produkty tego Sprzedawcy
           </button>
         </div>

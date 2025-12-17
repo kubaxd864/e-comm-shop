@@ -13,6 +13,7 @@ const {
   getUserByEmail,
   getOrCreateCart,
   buildCartSummary,
+  getFilteredProducts,
   calculateDeliverySum,
   requireAuth,
 } = require("./functions");
@@ -225,7 +226,7 @@ app.get("/api/get_product/data/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await promisePool.query(
-      `SELECT p.name, p.description, p.item_condition, p.price, p.quantity, p.created_at, c.id AS category_id, c.name AS category_name, c.slug AS category_slug, s.name AS shop_name, s.email AS shop_email, s.phone AS shop_phone, s.address AS shop_address, s.city AS shop_city, GROUP_CONCAT(img.file_path SEPARATOR '||') AS images 
+      `SELECT p.name, p.description, p.item_condition, p.price, p.quantity, p.created_at, c.id AS category_id, c.name AS category_name, c.slug AS category_slug, s.id AS shop_id, s.name AS shop_name, s.email AS shop_email, s.phone AS shop_phone, s.address AS shop_address, s.city AS shop_city, GROUP_CONCAT(img.file_path SEPARATOR '||') AS images 
       FROM products p LEFT JOIN product_images img ON img.product_id = p.id LEFT JOIN categories c ON c.id = p.category_id LEFT JOIN stores s ON s.id = p.store_id WHERE p.id = ?`,
       [id]
     );
@@ -485,6 +486,29 @@ app.get("/api/my_orders", requireAuth, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Błąd podczas pobierania zamówień" });
+  }
+});
+
+app.get("/api/products", async (req, res) => {
+  try {
+    const { products, pageNum, limitNum, categories, currentCategory } =
+      await getFilteredProducts(req.query);
+    const [stores] = await promisePool.query(`SELECT id, name FROM stores`);
+
+    res.json({
+      page: pageNum,
+      limit: limitNum,
+      count: products.length,
+      products,
+      categories,
+      currentCategory: currentCategory ? currentCategory.name : null,
+      stores,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Błąd podczas pobierania produktów",
+    });
   }
 });
 

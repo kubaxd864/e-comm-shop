@@ -15,11 +15,12 @@ export default function Myorders() {
     fetcher
   );
   const orders = useMemo(() => data?.orders ?? [], [data]);
-  console.log(orders);
   return (
     <main className="flex flex-1 w-full justify-center p-10 bg-white dark:bg-black">
       <div className="w-6/12">
-        <h1 className="text-3xl text-center mb-8">Twoje zamówienia</h1>
+        <h1 className="text-3xl font-bold text-center mb-8">
+          Twoje zamówienia
+        </h1>
         {isLoading ? (
           <p className="w-full text-center">Wczytywanie zamówień…</p>
         ) : error ? (
@@ -69,6 +70,10 @@ export default function Myorders() {
                       </div>
                     </div>
                   ))}
+                </div>
+                <div className="flex flex-row justify-between border-t border-gray-400 pt-3">
+                  <p className="">Razem z dostawą:</p>
+                  <p className="font-bold">{o.total_amount} zł</p>
                 </div>
               </li>
             ))}

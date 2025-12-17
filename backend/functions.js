@@ -150,6 +150,140 @@ async function buildCartSummary(items) {
   return { groups, itemsSum };
 }
 
+async function getFilteredProducts(query) {
+  const products = await fetchProducts(query);
+  const categoriesResult = await fetchCategories(query);
+
+  return {
+    products: products.rows ?? [],
+    pageNum: products.pageNum,
+    limitNum: products.limitNum,
+    categories: categoriesResult.rows,
+    currentCategory: categoriesResult.currentCategory ?? null,
+  };
+}
+
+async function fetchProducts(query) {
+  const {
+    name,
+    category,
+    priceMin,
+    priceMax,
+    condition,
+    shop,
+    sort = "newest",
+    page = 1,
+    limit = 20,
+  } = query;
+
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+  const offset = (pageNum - 1) * limitNum;
+
+  const where = ["p.is_active = 'true'"];
+  const params = [];
+
+  const add = (cond, sql, val) => {
+    if (!cond) return;
+    where.push(sql);
+    params.push(val);
+  };
+
+  add(name, "p.name LIKE ?", `%${name}%`);
+  add(priceMin, "p.price >= ?", Number(priceMin));
+  add(priceMax, "p.price <= ?", Number(priceMax));
+  add(condition, "p.item_condition LIKE ?", `%${condition}%`);
+  add(shop, "p.store_id = ?", Number(shop));
+
+  if (category) {
+    where.push(`
+        p.category_id IN (
+          SELECT id FROM categories
+          WHERE id = ? OR parent_id = ?
+        )
+      `);
+    params.push(Number(category), Number(category));
+  }
+
+  const SORT_MAP = {
+    name_asc: "p.name ASC",
+    name_desc: "p.name DESC",
+    price_asc: "p.price ASC",
+    price_desc: "p.price DESC",
+    newest: "p.created_at DESC",
+    oldest: "p.created_at ASC",
+  };
+
+  const productsSql = `
+      SELECT
+        p.id,
+        p.name,
+        p.category_id,
+        p.store_id,
+        p.item_condition,
+        p.price,
+        img.file_path AS thumbnail,
+        s.address AS store_address,
+        s.city AS store_city
+      FROM products p
+      LEFT JOIN product_images img
+        ON img.product_id = p.id AND img.alt_text = 'Zdjęcie 1'
+      LEFT JOIN stores s ON s.id = p.store_id
+      WHERE ${where.join(" AND ")}
+      ORDER BY ${SORT_MAP[sort] ?? SORT_MAP.newest}
+      LIMIT ? OFFSET ?
+    `;
+
+  const [rows] = await promisePool.query(productsSql, [
+    ...params,
+    limitNum,
+    offset,
+  ]);
+  return { rows, pageNum, limitNum };
+}
+
+async function fetchCategories(query) {
+  const { name, category } = query;
+  const where = [];
+  const params = [];
+
+  if (name) {
+    where.push("p.name LIKE ?");
+    params.push(`%${name}%`);
+  }
+
+  if (category) {
+    where.push("c.parent_id = ?");
+    params.push(Number(category));
+  }
+
+  const categorysql = `
+      SELECT
+        c.id,
+        c.name,
+        c.slug,
+        c.parent_id,
+        COUNT(p.id) AS productCount
+      FROM categories c
+      LEFT JOIN products p
+        ON p.category_id = c.id
+       AND p.is_active = 'true'
+      ${where.length ? `WHERE ${where.join(" AND ")}` : ""}
+      GROUP BY c.id, c.name, c.slug, c.parent_id
+      ORDER BY c.name
+      `;
+
+  const [rows] = await promisePool.query(categorysql, params);
+
+  const [[currentCategory]] = category
+    ? await promisePool.query(`SELECT name FROM categories WHERE id = ?`, [
+        category,
+      ])
+    : [[null]];
+
+  return { rows, currentCategory };
+}
+
 function calculateDeliverySum(groups, deliverySelections = {}) {
   return groups.reduce((acc, group) => {
     const selected = deliverySelections[group.store_id];
@@ -168,6 +302,7 @@ module.exports = {
   getToken,
   getPrices,
   buildCartSummary,
+  getFilteredProducts,
   calculateDeliverySum,
   requireAuth,
 };

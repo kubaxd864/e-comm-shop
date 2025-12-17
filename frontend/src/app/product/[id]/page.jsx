@@ -79,6 +79,7 @@ export default async function ProductPage({ params }) {
             </div>
             <ProductDescription
               description={product.description}
+              shop_id={product.shop_id}
               shop_address={product.shop_address}
               shop_city={product.shop_city}
               shop_phone={product.shop_phone}

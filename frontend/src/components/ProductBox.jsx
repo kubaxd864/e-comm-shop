@@ -34,7 +34,7 @@ export default function ProductBox({
           </div>
         )}
       </div>
-      <div className="flex flex-col p-3 gap-3 flex-1">
+      <div className="flex flex-col p-3 gap-3.5 flex-1">
         <Link
           href={`/product/${id}`}
           className="flex text-xl hover:text-blue-700"
