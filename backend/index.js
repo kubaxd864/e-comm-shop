@@ -8,12 +8,14 @@ const MySQLStore = require("express-mysql-session")(session);
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 const Stripe = require("stripe");
+const nodemailer = require("nodemailer");
 const { pool, promisePool } = require("./db");
 const {
   getUserByEmail,
   getOrCreateCart,
   buildCartSummary,
   getFilteredProducts,
+  fetchStores,
   calculateDeliverySum,
   requireAuth,
 } = require("./functions");
@@ -38,6 +40,16 @@ const sessionStore = new MySQLStore(
   },
   pool
 );
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.sendgrid.net",
+  port: 587,
+  auth: {
+    user: "apikey",
+    pass: process.env.SENDGRID_API_KEY,
+  },
+  tls: { rejectUnauthorized: false },
+});
 
 app.use(helmet());
 app.use(express.json());
@@ -493,7 +505,7 @@ app.get("/api/products", async (req, res) => {
   try {
     const { products, pageNum, limitNum, categories, currentCategory } =
       await getFilteredProducts(req.query);
-    const [stores] = await promisePool.query(`SELECT id, name FROM stores`);
+    const stores = await fetchStores();
 
     res.json({
       page: pageNum,
@@ -508,6 +520,30 @@ app.get("/api/products", async (req, res) => {
     console.error(err);
     res.status(500).json({
       message: "Błąd podczas pobierania produktów",
+    });
+  }
+});
+
+app.get("/api/get_stores", async (req, res) => {
+  const stores = await fetchStores();
+  res.json({ stores });
+});
+
+app.post("/api/contact", async (req, res) => {
+  try {
+    const { name, email, shopId, subject, message } = req.body;
+    await transporter.sendMail({
+      from: `"Formularz kontaktowy" <jakubsobczyk2004@wp.pl>`,
+      to: process.env.CONTACT_MAIL,
+      replyTo: email,
+      subject: `[Kontakt] ${subject}`,
+      text: `Imię: ${name} E-mail: ${email}\n\n${message}`,
+    });
+    res.status(200).json({ message: "Wysłano" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Błąd Wysyłania",
     });
   }
 });

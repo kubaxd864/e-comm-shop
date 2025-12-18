@@ -284,6 +284,11 @@ async function fetchCategories(query) {
   return { rows, currentCategory };
 }
 
+async function fetchStores() {
+  const [stores] = await promisePool.query(`SELECT * FROM stores`);
+  return stores;
+}
+
 function calculateDeliverySum(groups, deliverySelections = {}) {
   return groups.reduce((acc, group) => {
     const selected = deliverySelections[group.store_id];
@@ -303,6 +308,7 @@ module.exports = {
   getPrices,
   buildCartSummary,
   getFilteredProducts,
+  fetchStores,
   calculateDeliverySum,
   requireAuth,
 };
