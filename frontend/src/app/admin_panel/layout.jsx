@@ -1,0 +1,10 @@
+import AdminMenu from "@/components/AdminMenu";
+
+export default function AdminLayout({ children }) {
+  return (
+    <div className="flex flex-row">
+      <AdminMenu />
+      <main className="w-full">{children}</main>
+    </div>
+  );
+}

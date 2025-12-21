@@ -289,6 +289,21 @@ async function fetchStores() {
   return stores;
 }
 
+async function fetchOrders() {
+  const [orders] = await promisePool.query(
+    "SELECT o.id, u.name, u.surname, o.total_amount, o.status, o.created_at FROM orders o LEFT JOIN users u ON u.id = o.user_id"
+  );
+  return orders;
+}
+
+async function fetchLatestProducts() {
+  const [products] = await promisePool.query(
+    `SELECT p.id, p.name, p.price, p.store_id, p.created_at, img.file_path AS thumbnail FROM products p 
+    LEFT JOIN product_images img ON img.product_id = p.id AND img.alt_text = 'Zdjęcie 1' WHERE p.is_active = 'true' ORDER BY p.created_at DESC LIMIT 5`
+  );
+  return products;
+}
+
 function calculateDeliverySum(groups, deliverySelections = {}) {
   return groups.reduce((acc, group) => {
     const selected = deliverySelections[group.store_id];
@@ -309,6 +324,8 @@ module.exports = {
   buildCartSummary,
   getFilteredProducts,
   fetchStores,
+  fetchOrders,
+  fetchLatestProducts,
   calculateDeliverySum,
   requireAuth,
 };

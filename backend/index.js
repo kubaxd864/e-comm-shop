@@ -16,6 +16,8 @@ const {
   buildCartSummary,
   getFilteredProducts,
   fetchStores,
+  fetchOrders,
+  fetchLatestProducts,
   calculateDeliverySum,
   requireAuth,
 } = require("./functions");
@@ -545,6 +547,48 @@ app.post("/api/contact", async (req, res) => {
     res.status(500).json({
       message: "Błąd Wysyłania",
     });
+  }
+});
+
+app.get("/api/admin_data", async (req, res) => {
+  try {
+    const [sum] = await promisePool.query(
+      `SELECT SUM(total_amount) AS total_sum FROM orders`
+    );
+    const [weeklysum] = await promisePool.query(
+      `SELECT SUM(total_amount) AS weekly_sum FROM orders WHERE YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)`
+    );
+    const [weeklysales] = await promisePool.query(`
+      SELECT
+        DATE(o.created_at) AS day,
+        SUM(oi.quantity) AS items_sold
+      FROM orders o
+      JOIN order_items oi ON oi.order_id = o.id
+      WHERE o.created_at >= CURDATE() - INTERVAL 6 DAY
+        AND o.created_at < CURDATE() + INTERVAL 1 DAY
+      GROUP BY DATE(o.created_at)
+      ORDER BY DATE(o.created_at)
+    `);
+    const [weeklyNewUsers] = await promisePool.query(`
+      SELECT DATE(u.created_at) AS day, COUNT(*) AS new_users
+      FROM users u
+      WHERE u.created_at >= CURDATE() - INTERVAL 6 DAY
+        AND u.created_at < CURDATE() + INTERVAL 1 DAY
+      GROUP BY DATE(u.created_at)
+      ORDER BY DATE(u.created_at)
+    `);
+    const orders = await fetchOrders();
+    const products = await fetchLatestProducts();
+    res.json({
+      sum,
+      weeklysum,
+      weeklysales,
+      weeklyNewUsers,
+      orders,
+      products,
+    });
+  } catch (err) {
+    console.error(err);
   }
 });
 
