@@ -1,32 +1,56 @@
 "use client";
-import { useToast } from "@/components/ToastProvider";
 import Categories from "@/components/Categories";
 import ProductBox from "@/components/ProductBox";
+import useSWRInfinite from "swr/infinite";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
+
+const fetcher = (url) => axios.get(url).then((res) => res.data);
+const PAGE_SIZE = 20;
 
 export default function Home() {
-  const { addToast } = useToast();
-  const [products, setProducts] = useState([]);
+  const getKey = (pageIndex, previousPageData) => {
+    if (previousPageData && !previousPageData.products?.length) return null;
+    return `http://localhost:5000/api/get_products?limit=${PAGE_SIZE}&offset=${
+      pageIndex * PAGE_SIZE
+    }`;
+  };
+  const { data, error, size, setSize, isValidating } = useSWRInfinite(
+    getKey,
+    fetcher
+  );
+  const products = data
+    ? [].concat(...data.map((page) => page.products ?? []))
+    : [];
+  const isReachingEnd =
+    data && data[data.length - 1]?.products?.length < PAGE_SIZE;
+  const isLoadingMore = isValidating && !isReachingEnd;
+  const handleScroll = useCallback(() => {
+    if (
+      window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 &&
+      !isLoadingMore &&
+      !isReachingEnd
+    ) {
+      setSize(size + 1);
+    }
+  }, [isLoadingMore, isReachingEnd, setSize, size]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/get_products")
-      .then((res) => {
-        setProducts(res.data.products);
-      })
-      .catch((err) => {
-        addToast(err.response?.data.message || "Błąd Bazy danych", "error");
-      });
-  }, []);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   return (
-    <main className="flex flex-1 w-full flex-col gap-9 bg-white text-center dark:bg-black">
+    <main className="flex flex-1 flex-col gap-9 w-full bg-white text-center dark:bg-black">
       <Categories />
-      <>
-        <h1 className="text-4xl font-semibold tracking-tight text-black dark:text-zinc-50">
-          Wybrane Dla Ciebie
-        </h1>
+      <h1 className="text-4xl font-semibold tracking-tight text-black dark:text-zinc-50">
+        Wybrane Dla Ciebie
+      </h1>
+      {products.length === 0 && isValidating ? (
+        <p>Wczytywanie produktów...</p>
+      ) : error ? (
+        <p>Błąd pobierania Danych</p>
+      ) : (
         <div
           className="grid gap-15 max-w-[1650px] w-full mx-auto p-10"
           style={{
@@ -45,8 +69,18 @@ export default function Home() {
               city={product.store_city}
             />
           ))}
+          {isLoadingMore && (
+            <p className="col-span-full text-lg text-gray-400">
+              Ładowanie więcej...
+            </p>
+          )}
+          {isReachingEnd && products.length > 0 && (
+            <p className="col-span-full text-lg text-gray-400">
+              Brak nowych produktów
+            </p>
+          )}
         </div>
-      </>
+      )}
     </main>
   );
 }

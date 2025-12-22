@@ -9,6 +9,7 @@ const bcrypt = require("bcrypt");
 const cors = require("cors");
 const Stripe = require("stripe");
 const nodemailer = require("nodemailer");
+const { upload } = require("./multer");
 const { pool, promisePool } = require("./db");
 const {
   getUserByEmail,
@@ -18,6 +19,8 @@ const {
   fetchStores,
   fetchOrders,
   fetchLatestProducts,
+  buildCategoryTree,
+  uploadToCloudinary,
   calculateDeliverySum,
   requireAuth,
 } = require("./functions");
@@ -216,6 +219,8 @@ app.put("/api/user_update", requireAuth, async (req, res) => {
 });
 
 app.get("/api/get_products", async (req, res) => {
+  const limit = req.query.limit;
+  const offset = req.query.offset;
   try {
     const [rows] = await promisePool.query(
       `SELECT p.id, p.name, p.price, p.item_condition,
@@ -227,7 +232,7 @@ app.get("/api/get_products", async (req, res) => {
        LEFT JOIN stores s
         ON s.id = p.store_id
        WHERE p.is_active = 'true'
-       LIMIT 20 OFFSET 0;`
+       LIMIT ${limit} OFFSET ${offset}`
     );
     return res.json({ products: rows });
   } catch (err) {
@@ -528,7 +533,11 @@ app.get("/api/products", async (req, res) => {
 
 app.get("/api/get_stores", async (req, res) => {
   const stores = await fetchStores();
-  res.json({ stores });
+  const [categories] = await promisePool.query(
+    "SELECT id, name, parent_id FROM categories"
+  );
+  const tree = buildCategoryTree(categories);
+  res.json({ stores, categories: tree });
 });
 
 app.post("/api/contact", async (req, res) => {
@@ -589,6 +598,62 @@ app.get("/api/admin_data", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    res.status(500).json({
+      message: "Błąd Pobierania Danych",
+    });
+  }
+});
+
+app.post("/api/admin/add_product", upload.array("images"), async (req, res) => {
+  try {
+    const {
+      product_name,
+      category,
+      description,
+      quantity,
+      size,
+      shop,
+      condition,
+      price,
+    } = req.body;
+    const [weight, width, height, length] = size.split("/").map(Number);
+    const result = {
+      weight: weight,
+      width: width,
+      height: height,
+      length: length,
+    };
+    const [product] = await promisePool.query(
+      "INSERT INTO products (name, category_id, description, quantity, size, store_id, item_condition, price, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [
+        product_name,
+        category,
+        description,
+        quantity,
+        JSON.stringify(result),
+        shop,
+        condition,
+        price,
+        req.session.userId,
+      ]
+    );
+    const productId = product.insertId;
+    const uploadedImages = await Promise.all(
+      req.files.map((file) => uploadToCloudinary(file, `products/${productId}`))
+    );
+    const images = uploadedImages.map((item, idx) => [
+      productId,
+      item.url,
+      `Zdjęcie ${idx + 1}`,
+    ]);
+    await promisePool.query(
+      "INSERT INTO product_images (product_id, file_path, alt_text) VALUES ?",
+      [images]
+    );
+    res.status(200).json({ message: "Dodano" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Błąd Dodawania" });
   }
 });
 

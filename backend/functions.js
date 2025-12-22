@@ -1,6 +1,13 @@
 const qs = require("qs");
 const axios = require("axios");
 const { promisePool } = require("./db");
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_KEY,
+  api_secret: process.env.CLOUD_SECRET,
+});
 
 async function getUserByEmail(email) {
   const [rows] = await promisePool.query(
@@ -176,10 +183,7 @@ async function fetchProducts(query) {
     limit = 20,
   } = query;
 
-  const pageNum = Number(page);
-  const limitNum = Number(limit);
-  const offset = (pageNum - 1) * limitNum;
-
+  const offset = (page - 1) * limit;
   const where = ["p.is_active = 'true'"];
   const params = [];
 
@@ -231,15 +235,11 @@ async function fetchProducts(query) {
       LEFT JOIN stores s ON s.id = p.store_id
       WHERE ${where.join(" AND ")}
       ORDER BY ${SORT_MAP[sort] ?? SORT_MAP.newest}
-      LIMIT ? OFFSET ?
+      LIMIT ${limit} OFFSET ${offset}
     `;
 
-  const [rows] = await promisePool.query(productsSql, [
-    ...params,
-    limitNum,
-    offset,
-  ]);
-  return { rows, pageNum, limitNum };
+  const [rows] = await promisePool.query(productsSql, [...params]);
+  return { rows };
 }
 
 async function fetchCategories(query) {
@@ -304,6 +304,44 @@ async function fetchLatestProducts() {
   return products;
 }
 
+function buildCategoryTree(items) {
+  const map = new Map();
+  items.forEach((i) => map.set(i.id, { ...i, children: [] }));
+  const roots = [];
+  for (const item of items) {
+    const node = map.get(item.id);
+    if (item.parent_id == null) {
+      roots.push(node);
+    } else {
+      const parent = map.get(item.parent_id);
+      if (parent) parent.children.push(node);
+      else roots.push(node);
+    }
+  }
+  return roots;
+}
+
+function uploadToCloudinary(file, folder) {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type: "auto",
+      },
+      (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve({
+          uploadId: result.public_id,
+          url: result.secure_url,
+        });
+      }
+    );
+    uploadStream.end(file.buffer);
+  });
+}
+
 function calculateDeliverySum(groups, deliverySelections = {}) {
   return groups.reduce((acc, group) => {
     const selected = deliverySelections[group.store_id];
@@ -316,6 +354,8 @@ function requireAuth(req, res, next) {
   return res.status(401).json({ message: "Użytkownik niezalogowany" });
 }
 
+function requireAdmin(req, res, next) {}
+
 module.exports = {
   getUserByEmail,
   getOrCreateCart,
@@ -326,6 +366,8 @@ module.exports = {
   fetchStores,
   fetchOrders,
   fetchLatestProducts,
+  buildCategoryTree,
+  uploadToCloudinary,
   calculateDeliverySum,
   requireAuth,
 };

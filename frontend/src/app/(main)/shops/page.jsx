@@ -8,10 +8,7 @@ const fetcher = (url) => axios.get(url).then((r) => r.data);
 
 export default function Shops() {
   const router = useRouter();
-  const { data, error, isLoading } = useSWR(
-    `http://localhost:5000/api/get_stores`,
-    fetcher
-  );
+  const { data } = useSWR(`http://localhost:5000/api/get_stores`, fetcher);
   const shops = data?.stores ?? [];
   return (
     <main className="flex flex-1 flex-col w-full items-center p-10 bg-white dark:bg-black">

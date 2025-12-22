@@ -10,6 +10,7 @@ import {
   faReceipt,
   faTags,
   faChartColumn,
+  faBoxesStacked,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function AdminMenu() {
@@ -58,6 +59,21 @@ export default function AdminMenu() {
             }`}
           >
             Dodaj Produkt
+          </span>
+        </Link>
+        <Link
+          href={"/admin_panel/products"}
+          className="flex items-center gap-3 p-2 rounded hover:bg-zinc-800 text-white"
+        >
+          <FontAwesomeIcon icon={faBoxesStacked} className="w-5 h-5 shrink-0" />
+          <span
+            className={`transition-all duration-200 ease-out overflow-hidden whitespace-nowrap origin-left transform ${
+              openMenu
+                ? "opacity-100 translate-x-0 max-w-[200px]"
+                : "opacity-0 -translate-x-2 max-w-0 pointer-events-none"
+            }`}
+          >
+            Produkty
           </span>
         </Link>
         <Link
