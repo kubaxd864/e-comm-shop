@@ -52,7 +52,7 @@ export default function FilterSideBar({ categories, stores }) {
   }
 
   return (
-    <div className="w-1/4 h-fit min-w-[300px] flex flex-col gap-6 bg-zinc-900 rounded-sm px-4 py-8">
+    <div className="w-1/4 h-fit min-w-[300px] flex flex-col gap-6 bg-bg-secondary rounded-sm px-4 py-8">
       <h1 className="text-2xl">Sortowanie</h1>
       <div className="relative">
         <select
@@ -60,24 +60,36 @@ export default function FilterSideBar({ categories, stores }) {
           defaultValue="newest"
           onChange={() => FilterResults()}
           ref={sortTypeRef}
-          className="appearance-none w-full border border-gray-500 rounded-sm py-2 px-4 pr-10 bg-zinc-900 text-gray-400"
+          className="appearance-none w-full border border-border rounded-sm py-2 px-4 pr-10 text-gray-400"
         >
-          <option value="newest" className="bg-zinc-900 text-white">
+          <option value="newest" className="bg-bg-secondary text-text-primary">
             Data dodania: Najnowsze
           </option>
-          <option value="oldest" className="bg-zinc-900 text-white">
+          <option value="oldest" className="bg-bg-secondary text-text-primary">
             Data dodania: Najstarsze
           </option>
-          <option value="price_asc" className="bg-zinc-900 text-white">
+          <option
+            value="price_asc"
+            className="bg-bg-secondary text-text-primary"
+          >
             Cena od: Najniższej
           </option>
-          <option value="price_desc" className="bg-zinc-900 text-white">
+          <option
+            value="price_desc"
+            className="bg-bg-secondary text-text-primary"
+          >
             Cena od: Najwyższej
           </option>
-          <option value="name_asc" className="bg-zinc-900 text-white">
+          <option
+            value="name_asc"
+            className="bg-bg-secondary text-text-primary"
+          >
             Nazwa od: A-Z
           </option>
-          <option value="name_desc" className="bg-zinc-900 text-white">
+          <option
+            value="name_desc"
+            className="bg-bg-secondary text-text-primary"
+          >
             Nazwa od: Z-A
           </option>
         </select>
@@ -125,14 +137,14 @@ export default function FilterSideBar({ categories, stores }) {
               placeholder="od"
               onBlur={() => FilterResults()}
               ref={priceMinRef}
-              className="flex w-1/2 border border-gray-500 rounded-sm py-2 px-4"
+              className="flex w-1/2 border border-border rounded-sm py-2 px-4"
             ></input>
             <input
               type="number"
               placeholder="do"
               onBlur={() => FilterResults()}
               ref={priceMaxRef}
-              className="flex w-1/2 border border-gray-500 rounded-sm py-2 px-4"
+              className="flex w-1/2 border border-border rounded-sm py-2 px-4"
             ></input>
           </div>
         </div>
@@ -144,15 +156,25 @@ export default function FilterSideBar({ categories, stores }) {
               onChange={() => FilterResults()}
               ref={conditionRef}
               defaultValue=""
-              className="appearance-none w-full border border-gray-500 rounded-sm py-2 px-4 pr-10 bg-zinc-900 text-gray-400"
+              className="appearance-none w-full border border-border rounded-sm py-2 px-4 pr-10 text-gray-400"
             >
-              <option value="" disabled className="bg-zinc-900 text-white">
+              <option
+                value=""
+                disabled
+                className="bg-bg-secondary text-text-primary"
+              >
                 Stan...
               </option>
-              <option value="Nowe" className="bg-zinc-900 text-white">
+              <option
+                value="Nowe"
+                className="bg-bg-secondary text-text-primary"
+              >
                 Nowe
               </option>
-              <option value="Używane" className="bg-zinc-900 text-white">
+              <option
+                value="Używane"
+                className="bg-bg-secondary text-text-primary"
+              >
                 Używane
               </option>
             </select>
@@ -182,16 +204,20 @@ export default function FilterSideBar({ categories, stores }) {
               onChange={() => FilterResults()}
               ref={shopRef}
               defaultValue=""
-              className="appearance-none w-full border border-gray-500 rounded-sm py-2 px-4 pr-10 bg-zinc-900 text-gray-400"
+              className="appearance-none w-full border border-border rounded-sm py-2 px-4 pr-10 text-gray-400"
             >
-              <option value="" disabled className="bg-zinc-900 text-white">
+              <option
+                value=""
+                disabled
+                className="bg-bg-secondary text-text-primary"
+              >
                 Sklep...
               </option>
               {stores.map((store) => (
                 <option
                   key={store.id}
                   value={store.id}
-                  className="bg-zinc-900 text-white"
+                  className="bg-bg-secondary text-text-primary"
                 >
                   {store.name}
                 </option>
@@ -218,7 +244,7 @@ export default function FilterSideBar({ categories, stores }) {
       </div>
       <button
         onClick={() => ClearFilters()}
-        className="bg-blue-800 px-1.5 py-3.5 rounded-sm cursor-pointer"
+        className="bg-primary text-text-secondary px-1.5 py-3.5 rounded-sm cursor-pointer hover:bg-primary-hover"
       >
         Wyczyść Filtry
       </button>

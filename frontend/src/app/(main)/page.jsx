@@ -41,9 +41,9 @@ export default function Home() {
   }, [handleScroll]);
 
   return (
-    <main className="flex flex-1 flex-col gap-9 w-full bg-white text-center dark:bg-black">
+    <main className="flex flex-1 flex-col gap-9 w-full text-center">
       <Categories />
-      <h1 className="text-4xl font-semibold tracking-tight text-black dark:text-zinc-50">
+      <h1 className="text-4xl font-semibold tracking-tight">
         Wybrane Dla Ciebie
       </h1>
       {products.length === 0 && isValidating ? (

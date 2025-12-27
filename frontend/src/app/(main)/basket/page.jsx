@@ -9,7 +9,7 @@ export default function Basket() {
   const router = useRouter();
 
   return (
-    <main className="flex flex-1 w-full justify-center bg-white dark:bg-black">
+    <main className="flex flex-1 w-full justify-center">
       <div className="flex flex-col w-10/12 m-10 items-center gap-9">
         <h1 className="text-3xl font-bold text-center">Twój Koszyk</h1>
         {isLoading ? (
@@ -26,7 +26,10 @@ export default function Basket() {
           <div className="flex flex-row gap-4 w-full justify-center">
             <div className="flex flex-col gap-4">
               {groupedByStore.map((el, idx) => (
-                <div key={idx} className="flex flex-col gap-1 p-4 bg-zinc-900">
+                <div
+                  key={idx}
+                  className="flex flex-col gap-1 p-4 bg-bg-secondary"
+                >
                   <p className="">Przesyłka od {el.store_name}</p>
                   {el.items.map((el, idx) => (
                     <CartItem
@@ -44,7 +47,7 @@ export default function Basket() {
                 </div>
               ))}
             </div>
-            <div className="flex flex-col h-fit w-[25%] min-w-72 gap-2 bg-zinc-900 rounded-sm p-4">
+            <div className="flex flex-col h-fit w-[25%] min-w-72 gap-2 bg-bg_secondary rounded-sm p-4">
               <div className="flex flex-row w-full justify-between">
                 <p>Wartość produktów:</p>
                 <p>{itemsSum.toFixed(2)} zł</p>
@@ -64,13 +67,13 @@ export default function Basket() {
               <div className="flex flex-col gap-3 pt-5 w-full">
                 <button
                   onClick={() => router.push(`/order`)}
-                  className="bg-blue-700 px-2 py-3 rounded-sm cursor-pointer"
+                  className="bg-primary px-2 py-3 rounded-sm cursor-pointer text-text-secondary hover:bg-primary-hover"
                 >
                   Finalizuj Zamówienie
                 </button>
                 <button
                   onClick={() => router.push("/")}
-                  className="border-2 border-gray-400 px-2 py-3 rounded-sm cursor-pointer"
+                  className="border-2 border-border px-2 py-3 rounded-sm cursor-pointer"
                 >
                   Kontynuuj Zakupy
                 </button>

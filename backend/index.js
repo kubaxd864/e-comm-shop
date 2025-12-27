@@ -21,6 +21,8 @@ const {
   fetchLatestProducts,
   buildCategoryTree,
   uploadToCloudinary,
+  getPublicIdFromUrl,
+  deleteFromCloudinary,
   calculateDeliverySum,
   requireAuth,
 } = require("./functions");
@@ -228,10 +230,10 @@ app.get("/api/get_products", async (req, res) => {
        s.address AS store_address, s.city AS store_city
         FROM products p
        LEFT JOIN product_images img
-        ON img.product_id = p.id AND img.alt_text = 'Zdjęcie 1'
+        ON img.product_id = p.id AND img.is_main
        LEFT JOIN stores s
         ON s.id = p.store_id
-       WHERE p.is_active = 'true'
+       WHERE p.is_active = 1
        LIMIT ${limit} OFFSET ${offset}`
     );
     return res.json({ products: rows });
@@ -245,8 +247,15 @@ app.get("/api/get_product/data/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await promisePool.query(
-      `SELECT p.name, p.description, p.item_condition, p.price, p.quantity, p.created_at, c.id AS category_id, c.name AS category_name, c.slug AS category_slug, s.id AS shop_id, s.name AS shop_name, s.email AS shop_email, s.phone AS shop_phone, s.address AS shop_address, s.city AS shop_city, GROUP_CONCAT(img.file_path SEPARATOR '||') AS images 
-      FROM products p LEFT JOIN product_images img ON img.product_id = p.id LEFT JOIN categories c ON c.id = p.category_id LEFT JOIN stores s ON s.id = p.store_id WHERE p.id = ?`,
+      `SELECT p.name, p.description, p.item_condition, p.price, p.quantity, p.size, p.created_at, 
+      c.id AS category_id, c.name AS category_name, c.slug AS category_slug, s.id AS shop_id,
+      s.name AS shop_name, s.email AS shop_email, s.phone AS shop_phone, s.address AS shop_address, s.city AS shop_city,
+      GROUP_CONCAT(img.file_path SEPARATOR '||') AS images, MAX(CASE WHEN img.is_main = 1 THEN img.file_path END) AS thumbnail
+      FROM products p
+      LEFT JOIN product_images img ON img.product_id = p.id
+      LEFT JOIN categories c ON c.id = p.category_id
+      LEFT JOIN stores s ON s.id = p.store_id
+      WHERE p.id = ?`,
       [id]
     );
     if (!rows[0])
@@ -262,7 +271,7 @@ app.get("/api/get_simular_products", async (req, res) => {
   const { category_id, id } = req.query;
   try {
     const [rows] = await promisePool.query(
-      `SELECT p.id, p.name, p.price, img.file_path FROM products p LEFT JOIN product_images img ON img.product_id = p.id AND img.alt_text = 'Zdjęcie 1' WHERE p.category_id = ? AND p.id != ?`,
+      `SELECT p.id, p.name, p.price, img.file_path FROM products p LEFT JOIN product_images img ON img.product_id = p.id AND img.is_main WHERE p.category_id = ? AND p.id != ?`,
       [category_id, id]
     );
     return res.json({ products: rows });
@@ -279,7 +288,7 @@ app.get("/api/favorites", requireAuth, async (req, res) => {
      FROM favorites f
      JOIN products p ON p.id = f.product_id
      LEFT JOIN product_images img
-     ON img.product_id = p.id AND img.alt_text = "Zdjęcie 1"
+     ON img.product_id = p.id AND img.is_main
      LEFT JOIN stores s
      ON s.id = p.store_id
      WHERE f.user_id = ?
@@ -335,7 +344,7 @@ app.get("/api/cart", requireAuth, async (req, res) => {
        JOIN products p ON p.id = c.product_id
        JOIN stores s ON s.id = p.store_id
        LEFT JOIN product_images img
-         ON img.product_id = p.id AND img.alt_text = 'Zdjęcie 1'
+         ON img.product_id = p.id AND img.is_main
        WHERE c.cart_id = ?`,
       [cart.id]
     );
@@ -464,7 +473,7 @@ app.post("/api/make_order", requireAuth, async (req, res) => {
     ]);
     const ids = items.map((item) => item.id);
     await promisePool.query(
-      "UPDATE products SET is_active = 'false' WHERE id IN (?)",
+      "UPDATE products SET is_active = 0 WHERE id IN (?)",
       [ids]
     );
     res.status(200).json({ message: "Złożono zamówienie" });
@@ -487,7 +496,7 @@ app.get("/api/my_orders", requireAuth, async (req, res) => {
       `SELECT oi.order_id, oi.product_id, oi.quantity, oi.price, p.name AS product_name, img.file_path AS thumbnail
        FROM order_items oi
        JOIN products p ON p.id = oi.product_id
-       LEFT JOIN product_images img ON img.product_id = p.id AND img.alt_text = 'Zdjęcie 1'
+       LEFT JOIN product_images img ON img.product_id = p.id AND img.is_main
        WHERE oi.order_id IN (?)`,
       [orderIds]
     );
@@ -615,6 +624,7 @@ app.post("/api/admin/add_product", upload.array("images"), async (req, res) => {
       shop,
       condition,
       price,
+      imageIsMain,
     } = req.body;
     const [weight, width, height, length] = size.split("/").map(Number);
     const result = {
@@ -638,22 +648,164 @@ app.post("/api/admin/add_product", upload.array("images"), async (req, res) => {
       ]
     );
     const productId = product.insertId;
-    const uploadedImages = await Promise.all(
-      req.files.map((file) => uploadToCloudinary(file, `products/${productId}`))
-    );
-    const images = uploadedImages.map((item, idx) => [
+    const uploadedImages = req.files?.length
+      ? await Promise.all(
+          req.files.map((file) =>
+            uploadToCloudinary(file, `products/${productId}`)
+          )
+        )
+      : [];
+    const imagesToInsert = uploadedImages.map((item, idx) => [
       productId,
       item.url,
-      `Zdjęcie ${idx + 1}`,
+      imageIsMain[idx],
+      `Zdjęcie Produktu`,
     ]);
     await promisePool.query(
-      "INSERT INTO product_images (product_id, file_path, alt_text) VALUES ?",
-      [images]
+      "INSERT INTO product_images (product_id, file_path, is_main, alt_text) VALUES ?",
+      [imagesToInsert]
     );
     res.status(200).json({ message: "Dodano" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Błąd Dodawania" });
+  }
+});
+
+app.get("/api/admin/get_products", async (req, res) => {
+  try {
+    const products = await fetchLatestProducts();
+    res.json({ products });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Błąd Dodawania" });
+  }
+});
+
+app.put("/api/admin/delete_product/:id", async (req, res) => {
+  try {
+    await promisePool.query(
+      `UPDATE products
+       SET is_active = NOT is_active
+       WHERE id = ?`,
+      [req.params.id]
+    );
+    return res.json({ message: "Ukryto Produkt" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Błąd podczas Usuwania" });
+  }
+});
+
+app.put(
+  "/api/admin/update_product/:id",
+  upload.array("images"),
+  async (req, res) => {
+    try {
+      const id = req.params.id;
+      const {
+        product_name,
+        category,
+        description,
+        quantity,
+        size,
+        shop,
+        condition,
+        price,
+        imageIsMain,
+        existingImages,
+        existingImageIsMain,
+      } = req.body;
+      const [weight, width, height, length] = size.split("/").map(Number);
+      const result = {
+        weight: weight,
+        width: width,
+        height: height,
+        length: length,
+      };
+      console.log(req.body);
+      await promisePool.query(
+        `UPDATE products
+        SET name = ?, category_id = ?, description = ?, quantity = ?, size = ?, store_id = ?, item_condition = ?, price = ?
+        WHERE id = ?`,
+        [
+          product_name,
+          category,
+          description,
+          quantity,
+          JSON.stringify(result),
+          shop,
+          condition,
+          price,
+          id,
+        ]
+      );
+      const [dbImages] = await promisePool.query(
+        "SELECT * FROM product_images WHERE product_id = ?",
+        [id]
+      );
+      const imagesToDelete = dbImages.filter(
+        (img) => !existingImages.includes(img.file_path)
+      );
+      for (let i = 0; i < existingImages.length; i++) {
+        await promisePool.query(
+          "UPDATE product_images SET is_main = ? WHERE file_path = ? AND product_id = ?",
+          [existingImageIsMain[i], existingImages[i], id]
+        );
+      }
+      for (const img of imagesToDelete) {
+        const publicId = getPublicIdFromUrl(img.file_path);
+        await deleteFromCloudinary(publicId);
+        await promisePool.query("DELETE FROM product_images WHERE id = ?", [
+          img.id,
+        ]);
+      }
+      const uploadedImages = req.files?.length
+        ? await Promise.all(
+            req.files.map((file) => uploadToCloudinary(file, `products/${id}`))
+          )
+        : [];
+      if (uploadedImages.length > 0) {
+        const imagesToInsert = uploadedImages.map((item, idx) => [
+          id,
+          item.url,
+          imageIsMain[idx],
+          `Zdjęcie Produktu`,
+        ]);
+        await promisePool.query(
+          "INSERT INTO product_images (product_id, file_path, is_main, alt_text) VALUES ?",
+          [imagesToInsert]
+        );
+      }
+      res.status(200).json({ message: "Zaktualizowano" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Błąd podczas Aktualizacji" });
+    }
+  }
+);
+
+app.get("/api/admin/orders", async (req, res) => {
+  try {
+    const orders = await fetchOrders();
+    res.json({ orders });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Błąd podczas Aktualizacji" });
+  }
+});
+
+app.put("/api/admin/order_status", async (req, res) => {
+  try {
+    const { id, status } = req.body;
+    await promisePool.query("UPDATE orders SET status = ? WHERE id = ?", [
+      status,
+      id,
+    ]);
+    res.status(200).json({ message: "Zaktualizowano" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Błąd podczas Aktualizacji" });
   }
 });
 

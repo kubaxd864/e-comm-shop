@@ -6,7 +6,7 @@ export default function Favorites() {
   const { favorites, isLoading, isError } = useFavorites();
 
   return (
-    <main className="flex flex-1 w-full justify-center bg-white text-center dark:bg-black">
+    <main className="flex flex-1 w-full justify-center text-center">
       <div className="flex flex-col w-10/12 m-10 gap-9">
         <h1 className="text-3xl font-bold">Ulubione Produkty</h1>
         {isLoading ? (

@@ -15,7 +15,7 @@ export default function ProductBox({
   city,
 }) {
   return (
-    <div className="relative flex flex-col gap-2 bg-zinc-900 shadow-sm shadow-zinc-900 rounded-sm p-2 h-full">
+    <div className="relative flex flex-col gap-2 bg-bg-secondary shadow-sm rounded-sm p-2 h-full">
       <div className="relative w-full aspect-3/2 overflow-hidden rounded-lg bg-white">
         {!thumbnail == "" ? (
           <Image
@@ -37,7 +37,7 @@ export default function ProductBox({
       <div className="flex flex-col p-3 gap-3.5 flex-1">
         <Link
           href={`/product/${id}`}
-          className="flex text-xl hover:text-blue-700"
+          className="flex text-xl hover:text-primary-hover"
         >
           <p className="text-left">{name}</p>
         </Link>

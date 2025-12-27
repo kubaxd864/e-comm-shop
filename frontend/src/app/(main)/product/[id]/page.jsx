@@ -1,7 +1,7 @@
 import ImageGalleryClient from "@/components/PictureSlider";
 import FavoriteBtn from "@/components/FavoriteButton";
 import CartBtn from "@/components/AddCartButton";
-import ProductDescription from "@/components/ProductDescription";
+import ProductParameters from "@/components/ProductParameters";
 import SimilarProductsCarousel from "@/components/SimilarProdCarousel";
 import axios from "axios";
 import Link from "next/link";
@@ -46,8 +46,8 @@ export default async function ProductPage({ params }) {
     }
   }
   return (
-    <main className="flex flex-1 w-full flex-col justify-center items-center gap-9 bg-white dark:bg-black">
-      <div className="flex flex-col w-10/12 bg-zinc-900 p-4 m-16 rounded-lg gap-3">
+    <main className="flex flex-1 w-full flex-col justify-center items-center gap-9">
+      <div className="flex flex-col w-10/12 bg-bg-secondary p-4 m-16 rounded-lg gap-3">
         <div className="flex flex-row gap-3 px-2">
           <Link href={"/"}>Strona główna</Link> /
           <Link href={`/categories/${product.category_slug}`}>
@@ -61,9 +61,9 @@ export default async function ProductPage({ params }) {
           </div>
           <div className="flex flex-col gap-7 w-full px-6">
             <div>
-              <div className="flex flex-row justify-between">
+              <div className="flex flex-row justify-between gap-3">
                 <p className="text-3xl font-bold">{product.name}</p>
-                <p className="bg-zinc-800 h-fit py-2 px-3 rounded-lg">
+                <p className="bg-bg-accent h-fit py-2 px-3 rounded-lg">
                   {product.item_condition}
                 </p>
               </div>
@@ -77,7 +77,7 @@ export default async function ProductPage({ params }) {
               <FavoriteBtn productId={id} />
               <CartBtn productId={id} />
             </div>
-            <ProductDescription
+            <ProductParameters
               description={product.description}
               shop_id={product.shop_id}
               shop_address={product.shop_address}

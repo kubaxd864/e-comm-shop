@@ -11,14 +11,14 @@ export default function Shops() {
   const { data } = useSWR(`http://localhost:5000/api/get_stores`, fetcher);
   const shops = data?.stores ?? [];
   return (
-    <main className="flex flex-1 flex-col w-full items-center p-10 bg-white dark:bg-black">
+    <main className="flex flex-1 flex-col w-full items-center p-10">
       <h1 className="text-3xl font-bold text-center">Nasze Placówki</h1>
       <div className="flex flex-col w-full items-center p-8 rounded-lg gap-10">
         <div className="flex flex-row flex-wrap justify-center gap-6 w-full">
           {shops.map((shop, idx) => (
             <div
               key={idx}
-              className="w-[300px] flex flex-col gap-4 items-center p-4 bg-white dark:bg-zinc-900 rounded-md"
+              className="w-[300px] flex flex-col gap-4 items-center p-4 bg-bg-secondary rounded-md"
             >
               <div className="relative w-full h-40">
                 <Image
@@ -37,7 +37,7 @@ export default function Shops() {
               </div>
               <button
                 onClick={() => router.push(`/contact?placowka=${shop.id}`)}
-                className="bg-blue-700 p-3 rounded-sm mt-auto cursor-pointer"
+                className="bg-primary text-text-secondary p-3 rounded-sm mt-auto cursor-pointer hover:bg-primary-hover"
               >
                 Kontakt do Sklepu
               </button>

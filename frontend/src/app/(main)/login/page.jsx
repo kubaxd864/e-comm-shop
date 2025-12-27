@@ -6,9 +6,11 @@ import { TextField, Checkbox } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ToastProvider";
 import { useUser } from "@/components/UserProvider";
+import { useIsDark } from "@/hooks/useIsDark";
 
 export default function Login() {
   const { addToast } = useToast();
+  const { isDark } = useIsDark();
   const router = useRouter();
   const { refreshUser } = useUser();
   const {
@@ -37,8 +39,8 @@ export default function Login() {
     }
   }
   return (
-    <main className="flex flex-1 w-full flex-col items-center justify-center bg-white dark:bg-black">
-      <div className="flex flex-col bg-zinc-950 items-center gap-6 text-center rounded-sm p-16 m-10">
+    <main className="flex flex-1 w-full flex-col items-center justify-center">
+      <div className="flex flex-col bg-bg-secondary items-center gap-6 text-center rounded-sm p-16 m-10">
         <h2 className="text-3xl p-2">Zaloguj Się do Konta</h2>
         <form
           onSubmit={isSubmitSuccessful ? null : handleSubmit(onSubmit)}
@@ -64,7 +66,7 @@ export default function Login() {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
                 "&:hover fieldset": { borderColor: "rgb(148 163 184)" },
                 "&.Mui-focused fieldset": { borderColor: "rgb(59 130 246)" },
-                color: "white",
+                color: isDark ? "#fff" : "#000",
               },
               "& .MuiInputLabel-root": { color: "rgb(148 163 184)" },
             }}
@@ -86,7 +88,7 @@ export default function Login() {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
                 "&:hover fieldset": { borderColor: "rgb(148 163 184)" },
                 "&.Mui-focused fieldset": { borderColor: "rgb(59 130 246)" },
-                color: "white",
+                color: isDark ? "#fff" : "#000",
               },
               "& .MuiInputLabel-root": { color: "rgb(148 163 184)" },
             }}
@@ -114,7 +116,10 @@ export default function Login() {
                 Zarejestruj Się
               </button>
             </Link>
-            <button type="submit" className="bg-blue-800 px-6 py-3 rounded-sm">
+            <button
+              type="submit"
+              className="bg-primary text-text-secondary px-6 py-3 rounded-sm cursor-pointer hover:bg-primary-hover"
+            >
               {isSubmitting ? "Logowanie.. " : "Zaloguj Się"}
             </button>
           </div>

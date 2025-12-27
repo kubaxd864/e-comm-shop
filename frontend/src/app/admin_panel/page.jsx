@@ -26,45 +26,35 @@ export default function AdminPanel() {
     0
   );
   return (
-    <div className="flex flex-1 w-full flex-col items-center bg-white px-6 py-16 dark:bg-black">
+    <div className="flex flex-1 w-full flex-col items-center px-6 py-16">
       <div className="flex flex-col w-10/12 gap-10">
         <div className="flex flex-row gap-5">
-          <div className="flex flex-col gap-4 p-3.5 w-1/3 bg-zinc-900 rounded-lg">
-            <div className="flex flex-row justify-between">
-              <div className="flex flex-col gap-2">
-                <h1 className="text-xl font-semibold">Sprzedane Produkty</h1>
-                <p className="text-sm">Poniedziałek - Niedziela</p>
-              </div>
-              <p className="text-2xl">{weeklySalesSum}</p>
-            </div>
-            <WykresLiniowy data={weeklysales} />
-          </div>
-          <div className="flex flex-col gap-4 p-3.5 w-1/3 bg-zinc-900 rounded-lg">
-            <div className="flex flex-row justify-between">
-              <div className="flex flex-col gap-2">
-                <h1 className="text-xl font-semibold">Nowi Użytkownicy</h1>
-                <p className="text-sm">Poniedziałek - Niedziela</p>
-              </div>
-              <p className="text-2xl">{weeklyUsersSum}</p>
-            </div>
-            <WykresLiniowy data={weeklyNewUsers} />
-          </div>
+          <WykresLiniowy
+            data={weeklysales}
+            sum={weeklySalesSum}
+            title={"Sprzedane Produkty"}
+          />
+          <WykresLiniowy
+            data={weeklyNewUsers}
+            sum={weeklyUsersSum}
+            title={"Nowi Użytkownicy"}
+          />
           <div className="flex flex-col w-1/3 gap-5">
-            <div className="flex flex-row justify-between w-full h-1/2 bg-zinc-900 rounded-lg p-5">
+            <div className="flex flex-row justify-between w-full h-1/2 bg-bg-secondary rounded-lg p-5">
               <div className="flex flex-col gap-3">
                 <h2 className="text-xl font-semibold">Zysk Całkowity</h2>
                 <p className="text-3xl">{sum} zł</p>
               </div>
-              <div className="bg-blue-700 w-14 h-14 flex items-center justify-center rounded-full text-white">
+              <div className="bg-primary w-14 h-14 flex items-center justify-center rounded-full text-white">
                 <FontAwesomeIcon icon={faMoneyBill}></FontAwesomeIcon>
               </div>
             </div>
-            <div className="flex flex-row justify-between w-full h-1/2 bg-zinc-900 rounded-sm p-5">
+            <div className="flex flex-row justify-between w-full h-1/2 bg-bg-secondary rounded-sm p-5">
               <div className="flex flex-col gap-3">
                 <h2 className="text-xl font-semibold">Zysk z tego tygodnia</h2>
                 <p className="text-3xl">{weeklysum} zł</p>
               </div>
-              <div className="bg-blue-700 w-14 h-14 flex items-center justify-center rounded-full text-white">
+              <div className="bg-primary w-14 h-14 flex items-center justify-center rounded-full text-white">
                 <FontAwesomeIcon icon={faCoins}></FontAwesomeIcon>
               </div>
             </div>

@@ -61,7 +61,7 @@ export default function Category() {
   }, [handleScroll]);
 
   return (
-    <main className="flex flex-1 flex-col gap-6 w-full justify-center p-10 bg-white dark:bg-black">
+    <main className="flex flex-1 flex-col gap-6 w-full justify-center p-10">
       <h1 className="text-3xl text-center font-bold">
         Szukasz {name ? name : "w " + currentCategory}
       </h1>

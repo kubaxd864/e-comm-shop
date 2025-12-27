@@ -11,7 +11,7 @@ export default function DeliveryOptions() {
   } = useCart();
   const { register } = useFormContext();
   return (
-    <div className="flex flex-col gap-3 p-4 bg-zinc-900 rounded-sm w-3/4">
+    <div className="flex flex-col gap-3 p-4 bg-bg-secondary rounded-sm w-3/4">
       {isLoading ? (
         <div className="w-full text-center">
           <p>Ładowanie opcji dostawy...</p>
@@ -33,7 +33,7 @@ export default function DeliveryOptions() {
                     .map((e, idx) => (
                       <div
                         key={idx}
-                        className="flex flex-row items-center gap-4 p-4 bg-zinc-800 rounded hover:border-[1px] border-gray-400"
+                        className="flex flex-row items-center gap-4 p-4 bg-bg-accent rounded hover:border-[1px] border-gray-400"
                       >
                         <input
                           type="radio"

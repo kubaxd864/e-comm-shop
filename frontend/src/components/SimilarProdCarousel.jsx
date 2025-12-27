@@ -10,17 +10,29 @@ export default function SimilarProductsCarousel({ items = [] }) {
 
   return (
     <div className="flex flex-row gap-5 relative">
-      <button onClick={() => emblaApi?.scrollPrev()}>◀</button>
+      <button
+        type="button"
+        onClick={() => emblaApi?.scrollPrev()}
+        className="text-4xl cursor-pointer"
+      >
+        ‹
+      </button>
       <div ref={emblaRef} className="overflow-hidden">
         <div className="flex gap-4">
           {items.map((it) => (
-            <div key={it.id ?? it.name} className="flex-shrink-0 w-[205px]">
+            <div key={it.id ?? it.name} className="flex shrink-0 w-[205px]">
               <SimilarProd {...it} thumbnail={it.file_path} />
             </div>
           ))}
         </div>
       </div>
-      <button onClick={() => emblaApi?.scrollNext()}>▶</button>
+      <button
+        type="button"
+        onClick={() => emblaApi?.scrollNext()}
+        className="text-4xl cursor-pointer"
+      >
+        ›
+      </button>
     </div>
   );
 }

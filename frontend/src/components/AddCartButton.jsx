@@ -6,7 +6,7 @@ export default function CartBtn({ productId }) {
   const inCart = items?.some((item) => item.id == Number(productId));
   return (
     <button
-      className="bg-blue-800 px-5 py-2.5 rounded-sm cursor-pointer hover:bg-blue-700"
+      className="bg-primary px-5 py-2.5 rounded-sm cursor-pointer text-text-secondary hover:bg-primary-hover"
       onClick={() => addToCart(Number(productId))}
     >
       {inCart ? "W koszyku" : "Do koszyka"}

@@ -21,7 +21,9 @@ export default function QuantityNumber({ value, productId }) {
         onClick={handleMinus}
         disabled={Number(value) <= 1}
         className={`p-1 rounded ${
-          Number(value) <= 1 ? "text-zinc-600" : "text-white cursor-pointer"
+          Number(value) <= 1
+            ? "text-zinc-600"
+            : "text-text-primary cursor-pointer"
         }`}
       >
         <FontAwesomeIcon icon={faMinus} className="w-3 h-3" />
@@ -33,7 +35,7 @@ export default function QuantityNumber({ value, productId }) {
         className="w-12 bg-transparent text-center border-none outline-none focus:outline-none focus:ring-0 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
       <button
-        className="p-1 rounded text-white cursor-pointer"
+        className="p-1 rounded text-text-primary cursor-pointer"
         onClick={handlePlus}
       >
         <FontAwesomeIcon icon={faPlus} className="w-3 h-3" />

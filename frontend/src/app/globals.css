@@ -1,28 +1,37 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary: oklch(57.667% 0.19012 259.812);
+  --color-primary-hover: oklch(59.254% 0.16098 259.605);
+
+  --color-text-primary: oklch(21% 0.02 264);
+  --color-text-secondary: oklch(21% 0.02 264);
+
+  --color-bg-primary: oklch(98% 0.005 264);
+  --color-bg-secondary: oklch(96% 0.01 264);
+  --color-bg-accent: oklch(94% 0.015 264);
+
+  --color-border: oklch(44.6% 0.03 256.802);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+.dark {
+  --color-primary: oklch(57.667% 0.19012 259.812);
+  --color-primary-hover: oklch(59.254% 0.16098 259.605);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-text-primary: oklch(95% 0.01 264);
+  --color-text-secondary: oklch(95% 0.01 264);
+
+  --color-bg-primary: oklch(15% 0.01 264);
+  --color-bg-secondary: oklch(21% 0.006 285.885);
+  --color-bg-accent: oklch(27.4% 0.006 286.033);
+
+  --color-border: oklch(44.6% 0.03 256.802);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-bg-primary text-text-primary;
 }
 
 .hide-scrollbar::-webkit-scrollbar {

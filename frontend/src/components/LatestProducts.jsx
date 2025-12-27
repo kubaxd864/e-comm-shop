@@ -3,12 +3,12 @@ import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 
 export default function LatestProducts({ products }) {
   return (
-    <div className="flex flex-col bg-zinc-900 rounded-xl h-fit">
+    <div className="flex flex-col bg-bg-secondary rounded-xl h-fit">
       <div className="px-6 py-4 border-b">
         <h2 className="text-lg font-semibold">Latest products</h2>
       </div>
       <ul className="flex flex-col">
-        {products.map((product) => (
+        {products.slice(0, 5).map((product) => (
           <li
             key={product.id}
             className="flex items-center gap-4 px-6 py-4 border-b"
@@ -31,7 +31,7 @@ export default function LatestProducts({ products }) {
         ))}
       </ul>
       <div className="px-6 py-4 text-right">
-        <button className="text-sm font-medium text-blue-700 cursor-pointer hover:underline">
+        <button className="text-sm font-medium text-primary cursor-pointer hover:underline">
           View all →
         </button>
       </div>

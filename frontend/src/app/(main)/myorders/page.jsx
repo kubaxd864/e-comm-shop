@@ -16,7 +16,7 @@ export default function Myorders() {
   );
   const orders = useMemo(() => data?.orders ?? [], [data]);
   return (
-    <main className="flex flex-1 w-full justify-center p-10 bg-white dark:bg-black">
+    <main className="flex flex-1 w-full justify-center p-10">
       <div className="w-6/12">
         <h1 className="text-3xl font-bold text-center mb-8">
           Twoje zamówienia
@@ -32,9 +32,9 @@ export default function Myorders() {
             {orders.map((o, idx) => (
               <li
                 key={idx}
-                className="flex flex-col p-4 rounded gap-3 bg-zinc-50 dark:bg-zinc-900"
+                className="flex flex-col p-4 rounded gap-3 bg-bg-secondary"
               >
-                <div className="flex flex-row justify-between border-b border-gray-400 pb-3">
+                <div className="flex flex-row justify-between border-b border-border pb-3">
                   <p className="flex flex-row gap-2 justify-center items-center">
                     <FontAwesomeIcon icon={faBoxOpen}></FontAwesomeIcon>
                     Zamówienie #{idx}{" "}
@@ -71,7 +71,7 @@ export default function Myorders() {
                     </div>
                   ))}
                 </div>
-                <div className="flex flex-row justify-between border-t border-gray-400 pt-3">
+                <div className="flex flex-row justify-between border-t border-border pt-3">
                   <p className="">Razem z dostawą:</p>
                   <p className="font-bold">{o.total_amount} zł</p>
                 </div>

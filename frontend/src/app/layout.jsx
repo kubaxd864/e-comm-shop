@@ -21,6 +21,18 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="pl">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function () {
+            const saved = localStorage.getItem("theme");
+            if (saved === "dark") {
+              document.documentElement.classList.add("dark");
+            }
+            })();`,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
       >

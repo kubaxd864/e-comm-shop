@@ -7,7 +7,7 @@ const statusStyles = {
 
 export default function LatestOrders({ orders }) {
   return (
-    <div className="bg-zinc-900 rounded-xl h-fit">
+    <div className="bg-bg-secondary rounded-xl h-fit">
       <div className="px-6 py-4 border-b">
         <h2 className="text-lg font-semibold">Latest orders</h2>
       </div>
@@ -15,14 +15,14 @@ export default function LatestOrders({ orders }) {
         <table className="w-full text-sm">
           <thead className="text-left">
             <tr className="border-b">
-              <th className="px-6 py-3">Order</th>
+              <th className="px-6 py-3">Order_Nr</th>
               <th className="px-6 py-3">Customer</th>
               <th className="px-6 py-3">Date</th>
               <th className="px-6 py-3">Status</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
+            {orders.slice(0, 6).map((order) => (
               <tr key={order.id} className="border-b">
                 <td className="px-6 py-4.5 font-medium">{order.id}</td>
                 <td className="px-6 py-4.5">
@@ -46,7 +46,7 @@ export default function LatestOrders({ orders }) {
         </table>
       </div>
       <div className="px-6 py-4 text-right">
-        <button className="text-sm font-medium text-blue-700 cursor-pointer hover:underline">
+        <button className="text-sm font-medium text-primary cursor-pointer hover:underline">
           View all →
         </button>
       </div>

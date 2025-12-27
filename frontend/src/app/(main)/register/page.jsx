@@ -12,9 +12,11 @@ import {
   FormHelperText,
 } from "@mui/material";
 import { useToast } from "@/components/ToastProvider";
+import { useIsDark } from "@/hooks/useIsDark";
 
 export default function Register() {
   const { addToast } = useToast();
+  const { isDark } = useIsDark();
   const {
     register,
     handleSubmit,
@@ -40,8 +42,8 @@ export default function Register() {
     }
   }
   return (
-    <main className="flex flex-1 w-full flex-col items-center justify-center bg-white dark:bg-black">
-      <div className="flex flex-col bg-zinc-950 items-center gap-6 text-center rounded-sm p-16 m-10">
+    <main className="flex flex-1 w-full flex-col items-center justify-center">
+      <div className="flex flex-col bg-bg-secondary items-center gap-6 text-center rounded-sm p-16 m-10">
         <h2 className="text-3xl p-2">Zarejestruj Nowe Konto</h2>
         <form
           onSubmit={isSubmitSuccessful ? null : handleSubmit(onSubmit)}
@@ -67,7 +69,7 @@ export default function Register() {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
                 "&:hover fieldset": { borderColor: "rgb(148 163 184)" },
                 "&.Mui-focused fieldset": { borderColor: "rgb(59 130 246)" },
-                color: "white",
+                color: isDark ? "#fff" : "#000",
               },
               "& .MuiInputLabel-root": { color: "rgb(148 163 184)" },
             }}
@@ -94,7 +96,7 @@ export default function Register() {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
                 "&:hover fieldset": { borderColor: "rgb(148 163 184)" },
                 "&.Mui-focused fieldset": { borderColor: "rgb(59 130 246)" },
-                color: "white",
+                color: isDark ? "#fff" : "#000",
               },
               "& .MuiInputLabel-root": { color: "rgb(148 163 184)" },
             }}
@@ -118,12 +120,12 @@ export default function Register() {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
                 "&:hover fieldset": { borderColor: "rgb(148 163 184)" },
                 "&.Mui-focused fieldset": { borderColor: "rgb(59 130 246)" },
-                color: "white",
+                color: isDark ? "#fff" : "#000",
               },
               "& .MuiInputLabel-root": { color: "rgb(148 163 184)" },
             }}
           />
-          <h3 className="text-3xl p-4">Informacje Kontaktowe</h3>
+          <h3 className="text-3xl p-4">Dane użytkownika</h3>
           <TextField
             id="name"
             label="Imię i Nazwisko"
@@ -141,7 +143,7 @@ export default function Register() {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
                 "&:hover fieldset": { borderColor: "rgb(148 163 184)" },
                 "&.Mui-focused fieldset": { borderColor: "rgb(59 130 246)" },
-                color: "white",
+                color: isDark ? "#fff" : "#000",
               },
               "& .MuiInputLabel-root": { color: "rgb(148 163 184)" },
             }}
@@ -167,7 +169,7 @@ export default function Register() {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
                 "&:hover fieldset": { borderColor: "rgb(148 163 184)" },
                 "&.Mui-focused fieldset": { borderColor: "rgb(59 130 246)" },
-                color: "white",
+                color: isDark ? "#fff" : "#000",
               },
               "& .MuiInputLabel-root": { color: "rgb(148 163 184)" },
             }}
@@ -187,24 +189,29 @@ export default function Register() {
               render={({ field }) => (
                 <Select
                   {...field}
-                  labelId="demo-simple-select-error-label"
-                  id="demo-simple-select-error"
-                  variant="outlined"
                   MenuProps={{
                     PaperProps: {
-                      sx: { bgcolor: "#000", color: "white" },
+                      sx: {
+                        bgcolor: isDark ? "#0f172a" : "#f8fafc",
+                        color: isDark ? "#f1f5f9" : "#0f172a",
+                      },
+                    },
+                    MenuListProps: {
+                      sx: {
+                        "& .MuiMenuItem-root": {
+                          bgcolor: "transparent",
+                          "&:hover": {
+                            bgcolor: isDark
+                              ? "rgba(148, 163, 184, 0.1)"
+                              : "rgba(15, 23, 42, 0.06)",
+                          },
+                        },
+                      },
                     },
                   }}
                   sx={{
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgb(148 163 184)",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgb(148 163 184)",
-                    },
                     "& .MuiSelect-select": {
-                      color: "white",
-                      px: 1,
+                      color: isDark ? "#f1f5f9" : "#0f172a",
                     },
                   }}
                 >
@@ -264,7 +271,7 @@ export default function Register() {
                   "& fieldset": { borderColor: "rgb(148 163 184)" },
                   "&:hover fieldset": { borderColor: "rgb(148 163 184)" },
                   "&.Mui-focused fieldset": { borderColor: "rgb(59 130 246)" },
-                  color: "white",
+                  color: isDark ? "#fff" : "#000",
                 },
                 "& .MuiInputLabel-root": { color: "rgb(148 163 184)" },
               }}
@@ -286,7 +293,7 @@ export default function Register() {
                   "& fieldset": { borderColor: "rgb(148 163 184)" },
                   "&:hover fieldset": { borderColor: "rgb(148 163 184)" },
                   "&.Mui-focused fieldset": { borderColor: "rgb(59 130 246)" },
-                  color: "white",
+                  color: isDark ? "#fff" : "#000",
                 },
                 "& .MuiInputLabel-root": { color: "rgb(148 163 184)" },
               }}
@@ -309,7 +316,7 @@ export default function Register() {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
                 "&:hover fieldset": { borderColor: "rgb(148 163 184)" },
                 "&.Mui-focused fieldset": { borderColor: "rgb(59 130 246)" },
-                color: "white",
+                color: isDark ? "#fff" : "#000",
               },
               "& .MuiInputLabel-root": { color: "rgb(148 163 184)" },
             }}
@@ -338,7 +345,10 @@ export default function Register() {
                 Zaloguj się
               </button>
             </Link>
-            <button type="submit" className="bg-blue-800 px-6 py-3 rounded-sm">
+            <button
+              type="submit"
+              className="bg-primary text-text_secondary px-6 py-3 rounded-sm hover:bg-hover"
+            >
               {isSubmitSuccessful
                 ? "Zarejestrowano"
                 : isSubmitting

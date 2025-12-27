@@ -53,7 +53,7 @@ export default function UserData({ modified }) {
   }, [invoice, unregister]);
 
   return (
-    <div className="flex flex-col gap-3 p-8 bg-zinc-900 rounded-sm w-3/4">
+    <div className="flex flex-col gap-3 p-8 bg-bg-secondary rounded-sm w-3/4">
       <div className="flex flex-row gap-5">
         <div className="flex flex-col w-1/2 gap-1">
           <input
@@ -64,7 +64,7 @@ export default function UserData({ modified }) {
             name="name"
             type="text"
             placeholder="Imie*"
-            className={`w-full border-[1.5px] border-gray-500 px-2 py-3 rounded-sm ${
+            className={`w-full border-[1.5px] border-border px-2 py-3 rounded-sm ${
               formState.errors.name ? "border-red-400" : null
             }`}
           ></input>
@@ -81,7 +81,7 @@ export default function UserData({ modified }) {
             name="surname"
             type="text"
             placeholder="Nazwisko*"
-            className={`w-full border-[1.5px] border-gray-500 px-2 py-3 rounded-sm ${
+            className={`w-full border-[1.5px] border-border px-2 py-3 rounded-sm ${
               formState.errors.surname ? "border-red-400" : null
             }`}
           ></input>
@@ -99,7 +99,7 @@ export default function UserData({ modified }) {
           name="address"
           type="text"
           placeholder="Adres*"
-          className={`w-full border-[1.5px] border-gray-500 px-2 py-3 rounded-sm ${
+          className={`w-full border-[1.5px] border-border px-2 py-3 rounded-sm ${
             formState.errors.address ? "border-red-400" : null
           }`}
         ></input>
@@ -121,7 +121,7 @@ export default function UserData({ modified }) {
             name="postcode"
             type="text"
             placeholder="Kod Pocztowy*"
-            className={`w-full border-[1.5px] border-gray-500 px-2 py-3 rounded-sm ${
+            className={`w-full border-[1.5px] border-border px-2 py-3 rounded-sm ${
               formState.errors.postcode ? "border-red-400" : null
             }`}
           ></input>
@@ -138,7 +138,7 @@ export default function UserData({ modified }) {
             name="city"
             type="text"
             placeholder="Miejscowość*"
-            className={`w-full border-[1.5px] border-gray-500 px-2 py-3 rounded-sm ${
+            className={`w-full border-[1.5px] border-border px-2 py-3 rounded-sm ${
               formState.errors.city ? "border-red-400" : null
             }`}
           ></input>
@@ -160,7 +160,7 @@ export default function UserData({ modified }) {
             name="email"
             type="text"
             placeholder="E-mail*"
-            className={`w-full border-[1.5px] border-gray-500 px-2 py-3 rounded-sm ${
+            className={`w-full border-[1.5px] border-border px-2 py-3 rounded-sm ${
               formState.errors.email ? "border-red-400" : null
             }`}
           ></input>
@@ -181,7 +181,7 @@ export default function UserData({ modified }) {
             name="phone"
             type="text"
             placeholder="Nr Telefon*"
-            className={`w-full border-[1.5px] border-gray-500 px-2 py-3 rounded-sm ${
+            className={`w-full border-[1.5px] border-border px-2 py-3 rounded-sm ${
               formState.errors.phone ? "border-red-400" : null
             }`}
           ></input>{" "}
@@ -228,7 +228,7 @@ export default function UserData({ modified }) {
                 name="company_name"
                 type="text"
                 placeholder="Firma*"
-                className={`w-full border-[1.5px] border-gray-500 px-2 py-3 rounded-sm ${
+                className={`w-full border-[1.5px] border-border px-2 py-3 rounded-sm ${
                   formState.errors.company_name ? "border-red-400" : null
                 }`}
               ></input>
@@ -252,7 +252,7 @@ export default function UserData({ modified }) {
                 name="nip_number"
                 type="text"
                 placeholder="NIP*"
-                className={`w-full border-[1.5px] border-gray-500 px-2 py-3 rounded-sm ${
+                className={`w-full border-[1.5px] border-border px-2 py-3 rounded-sm ${
                   formState.errors.nip_number ? "border-red-400" : null
                 }`}
               ></input>
@@ -270,7 +270,7 @@ export default function UserData({ modified }) {
               name="company_address"
               type="text"
               placeholder="Adres*"
-              className={`w-full border-[1.5px] border-gray-500 px-2 py-3 rounded-sm ${
+              className={`w-full border-[1.5px] border-border px-2 py-3 rounded-sm ${
                 formState.errors.company_address ? "border-red-400" : null
               }`}
             ></input>
@@ -287,7 +287,7 @@ export default function UserData({ modified }) {
               name="country"
               type="text"
               placeholder="Kraj*"
-              className={`w-full border-[1.5px] border-gray-500 px-2 py-3 rounded-sm ${
+              className={`w-full border-[1.5px] border-border px-2 py-3 rounded-sm ${
                 formState.errors.country ? "border-red-400" : null
               }`}
             ></input>
@@ -309,7 +309,7 @@ export default function UserData({ modified }) {
                 name="company_postcode"
                 type="text"
                 placeholder="Kod Pocztowy*"
-                className={`w-full border-[1.5px] border-gray-500 px-2 py-3 rounded-sm ${
+                className={`w-full border-[1.5px] border-border px-2 py-3 rounded-sm ${
                   formState.errors.company_postcode ? "border-red-400" : null
                 }`}
               ></input>
@@ -326,7 +326,7 @@ export default function UserData({ modified }) {
                 name="company_city"
                 type="text"
                 placeholder="Miejscowość*"
-                className={`w-full border-[1.5px] border-gray-500 px-2 py-3 rounded-sm ${
+                className={`w-full border-[1.5px] border-border px-2 py-3 rounded-sm ${
                   formState.errors.company_city ? "border-red-400" : null
                 }`}
               ></input>

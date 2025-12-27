@@ -184,7 +184,7 @@ async function fetchProducts(query) {
   } = query;
 
   const offset = (page - 1) * limit;
-  const where = ["p.is_active = 'true'"];
+  const where = ["p.is_active = 1"];
   const params = [];
 
   const add = (cond, sql, val) => {
@@ -231,7 +231,7 @@ async function fetchProducts(query) {
         s.city AS store_city
       FROM products p
       LEFT JOIN product_images img
-        ON img.product_id = p.id AND img.alt_text = 'Zdjęcie 1'
+        ON img.product_id = p.id AND img.is_main
       LEFT JOIN stores s ON s.id = p.store_id
       WHERE ${where.join(" AND ")}
       ORDER BY ${SORT_MAP[sort] ?? SORT_MAP.newest}
@@ -267,7 +267,7 @@ async function fetchCategories(query) {
       FROM categories c
       LEFT JOIN products p
         ON p.category_id = c.id
-       AND p.is_active = 'true'
+       AND p.is_active = 1
       ${where.length ? `WHERE ${where.join(" AND ")}` : ""}
       GROUP BY c.id, c.name, c.slug, c.parent_id
       ORDER BY c.name
@@ -291,15 +291,15 @@ async function fetchStores() {
 
 async function fetchOrders() {
   const [orders] = await promisePool.query(
-    "SELECT o.id, u.name, u.surname, o.total_amount, o.status, o.created_at FROM orders o LEFT JOIN users u ON u.id = o.user_id"
+    "SELECT o.id, u.name, u.surname, o.total_amount, o.status, o.created_at FROM orders o LEFT JOIN users u ON u.id = o.user_id ORDER BY o.created_at DESC"
   );
   return orders;
 }
 
 async function fetchLatestProducts() {
   const [products] = await promisePool.query(
-    `SELECT p.id, p.name, p.price, p.store_id, p.created_at, img.file_path AS thumbnail FROM products p 
-    LEFT JOIN product_images img ON img.product_id = p.id AND img.alt_text = 'Zdjęcie 1' WHERE p.is_active = 'true' ORDER BY p.created_at DESC LIMIT 5`
+    `SELECT p.id, p.name, p.price, p.store_id, p.is_active, p.created_at, img.file_path AS thumbnail FROM products p 
+    LEFT JOIN product_images img ON img.product_id = p.id AND img.is_main ORDER BY p.created_at DESC`
   );
   return products;
 }
@@ -342,6 +342,16 @@ function uploadToCloudinary(file, folder) {
   });
 }
 
+function getPublicIdFromUrl(url) {
+  const parts = url.split("/");
+  const fileName = parts.pop();
+  return `products/${fileName.split(".")[0]}`;
+}
+
+async function deleteFromCloudinary(publicId) {
+  return await cloudinary.uploader.destroy(publicId);
+}
+
 function calculateDeliverySum(groups, deliverySelections = {}) {
   return groups.reduce((acc, group) => {
     const selected = deliverySelections[group.store_id];
@@ -368,6 +378,8 @@ module.exports = {
   fetchLatestProducts,
   buildCategoryTree,
   uploadToCloudinary,
+  getPublicIdFromUrl,
+  deleteFromCloudinary,
   calculateDeliverySum,
   requireAuth,
 };

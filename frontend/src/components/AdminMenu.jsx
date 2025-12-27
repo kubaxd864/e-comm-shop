@@ -2,11 +2,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import ThemeToggle from "./ThemeSwitch";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUsers,
   faGear,
-  faPlus,
   faReceipt,
   faTags,
   faChartColumn,
@@ -15,14 +15,21 @@ import {
 
 export default function AdminMenu() {
   const [openMenu, setOpenMenu] = useState(false);
-
+  const menuItems = [
+    { link: "/admin_panel", icon: faChartColumn, title: "Statystyki" },
+    { link: "/admin_panel/products", icon: faBoxesStacked, title: "Produkty" },
+    { link: "/admin_panel/orders", icon: faReceipt, title: "Zamówienia" },
+    { link: "/admin_panel/clients", icon: faUsers, title: "Klienci" },
+    { link: "/admin_panel/categories", icon: faTags, title: "Kategorie" },
+    { link: "", icon: faGear, title: "Ustawienia" },
+  ];
   return (
     <header
-      className={`relative h-auto bg-zinc-900 transition-all duration-300 ease-in-out overflow-hidden ${
+      className={`relative h-auto bg-bg-secondary transition-all duration-300 ease-in-out overflow-hidden ${
         openMenu ? "w-60" : "w-20"
       }`}
       onMouseEnter={() => setOpenMenu(true)}
-      onMouseLeave={() => setTimeout(() => setOpenMenu(false), 700)}
+      onMouseLeave={() => setTimeout(() => setOpenMenu(false), 1000)}
     >
       <div className="p-3 flex items-center gap-3">
         <Link href={"/"}>
@@ -31,111 +38,36 @@ export default function AdminMenu() {
       </div>
 
       <div className="flex flex-col gap-3.5 p-4.5">
-        <Link
-          href={"/admin_panel"}
-          className="flex items-center gap-3 p-2 rounded hover:bg-zinc-800 text-white"
-        >
-          <FontAwesomeIcon icon={faChartColumn} className="w-5 h-5 shrink-0" />
-          <span
-            className={`transition-all duration-200 ease-out overflow-hidden whitespace-nowrap origin-left transform ${
-              openMenu
-                ? "opacity-100 translate-x-0 max-w-[200px]"
-                : "opacity-0 -translate-x-2 max-w-0 pointer-events-none"
-            }`}
+        {menuItems.map((e, idx) => (
+          <Link
+            key={idx}
+            href={e.link}
+            className="flex items-center gap-3 p-2 rounded text-text-primary"
           >
-            Statystyki
-          </span>
-        </Link>
-        <Link
-          href={"/admin_panel/addProduct"}
-          className="flex items-center gap-3 p-2 rounded hover:bg-zinc-800 text-white"
+            <FontAwesomeIcon icon={e.icon} className="w-5 h-5 shrink-0" />
+            <span
+              className={`transition-all duration-200 ease-out overflow-hidden whitespace-nowrap origin-left transform ${
+                openMenu
+                  ? "opacity-100 translate-x-0 max-w-[200px]"
+                  : "opacity-0 -translate-x-2 max-w-0 pointer-events-none"
+              }`}
+            >
+              {e.title}
+            </span>
+          </Link>
+        ))}
+      </div>
+      <div className="flex flex-row gap-3 px-1.5">
+        <ThemeToggle />
+        <span
+          className={`flex items-center justify-center transition-all duration-200 ease-out overflow-hidden whitespace-nowrap origin-left transform ${
+            openMenu
+              ? "opacity-100 translate-x-0 max-w-[200px]"
+              : "opacity-0 -translate-x-2 max-w-0 pointer-events-none"
+          }`}
         >
-          <FontAwesomeIcon icon={faPlus} className="w-5 h-5 shrink-0" />
-          <span
-            className={`transition-all duration-200 ease-out overflow-hidden whitespace-nowrap origin-left transform ${
-              openMenu
-                ? "opacity-100 translate-x-0 max-w-[200px]"
-                : "opacity-0 -translate-x-2 max-w-0 pointer-events-none"
-            }`}
-          >
-            Dodaj Produkt
-          </span>
-        </Link>
-        <Link
-          href={"/admin_panel/products"}
-          className="flex items-center gap-3 p-2 rounded hover:bg-zinc-800 text-white"
-        >
-          <FontAwesomeIcon icon={faBoxesStacked} className="w-5 h-5 shrink-0" />
-          <span
-            className={`transition-all duration-200 ease-out overflow-hidden whitespace-nowrap origin-left transform ${
-              openMenu
-                ? "opacity-100 translate-x-0 max-w-[200px]"
-                : "opacity-0 -translate-x-2 max-w-0 pointer-events-none"
-            }`}
-          >
-            Produkty
-          </span>
-        </Link>
-        <Link
-          href={"/admin_panel/orders"}
-          className="flex items-center gap-3 p-2 rounded hover:bg-zinc-800 text-white"
-        >
-          <FontAwesomeIcon icon={faReceipt} className="w-5 h-5 shrink-0" />
-          <span
-            className={`transition-all duration-200 ease-out overflow-hidden whitespace-nowrap origin-left transform ${
-              openMenu
-                ? "opacity-100 translate-x-0 max-w-[200px]"
-                : "opacity-0 -translate-x-2 max-w-0 pointer-events-none"
-            }`}
-          >
-            Zamówienia
-          </span>
-        </Link>
-        <Link
-          href={"/admin_panel/clients"}
-          className="flex items-center gap-3 p-2 rounded hover:bg-zinc-800 text-white"
-        >
-          <FontAwesomeIcon icon={faUsers} className="w-5 h-5 shrink-0" />
-          <span
-            className={`transition-all duration-200 ease-out overflow-hidden whitespace-nowrap origin-left transform ${
-              openMenu
-                ? "opacity-100 translate-x-0 max-w-[200px]"
-                : "opacity-0 -translate-x-2 max-w-0 pointer-events-none"
-            }`}
-          >
-            Klienci
-          </span>
-        </Link>
-        <Link
-          href={"/admin_panel/categories"}
-          className="flex items-center gap-3 p-2 rounded hover:bg-zinc-800 text-white"
-        >
-          <FontAwesomeIcon icon={faTags} className="w-5 h-5 shrink-0" />
-          <span
-            className={`transition-all duration-200 ease-out overflow-hidden whitespace-nowrap origin-left transform ${
-              openMenu
-                ? "opacity-100 translate-x-0 max-w-[200px]"
-                : "opacity-0 -translate-x-2 max-w-0 pointer-events-none"
-            }`}
-          >
-            Kategorie
-          </span>
-        </Link>
-        <Link
-          href={""}
-          className="flex items-center gap-3 p-2 rounded hover:bg-zinc-800 text-white"
-        >
-          <FontAwesomeIcon icon={faGear} className="w-5 h-5 shrink-0" />
-          <span
-            className={`transition-all duration-200 ease-out overflow-hidden whitespace-nowrap origin-left transform ${
-              openMenu
-                ? "opacity-100 translate-x-0 max-w-[200px]"
-                : "opacity-0 -translate-x-2 max-w-0 pointer-events-none"
-            }`}
-          >
-            Ustawienia
-          </span>
-        </Link>
+          Tryb
+        </span>
       </div>
     </header>
   );

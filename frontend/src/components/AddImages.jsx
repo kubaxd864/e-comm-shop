@@ -1,9 +1,11 @@
 import { useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { useToast } from "./ToastProvider";
 
 export default function ImageUploader({ images, setImages }) {
   const [dragged, setDragged] = useState(null);
+  const { addToast } = useToast();
   const inputRef = useRef(null);
 
   const handleFiles = ({ target }) => {
@@ -56,7 +58,7 @@ export default function ImageUploader({ images, setImages }) {
     <div className="flex flex-col gap-5 p-2">
       <div className="flex flex-col gap-2">
         <h2 className="text-xl font-semibold">Zdjęcia</h2>
-        <p className="text-sm text-gray-300">
+        <p className="text-sm text-gray-400">
           Pierwsze zdjęcie jest główne. Przeciągaj, aby zmienić kolejność.
         </p>
       </div>
@@ -69,24 +71,24 @@ export default function ImageUploader({ images, setImages }) {
             onDragOver={(e) => e.preventDefault()}
             onDrop={() => moveImage(i)}
             className={`relative aspect-square rounded overflow-hidden border-2 ${
-              img.isMain ? "border-blue-700" : "border-gray-300"
+              img.isMain ? "border-primary" : "border-gray-400"
             }`}
           >
             <img src={img.url} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition">
-              <div className="absolute inset-0 flex items-center justify-center text-white text-xs">
+              <div className="absolute inset-0 flex items-center justify-center text-xs">
                 <div className="flex">
                   <button onClick={() => removeImage(img.id)}>
                     <FontAwesomeIcon
                       icon={faTimes}
-                      className="text-red-400 hover:text-red-500 bg-zinc-900 p-2 rounded-full"
+                      className="text-red-400 hover:text-red-500 bg-bg-secondary p-2 rounded-full"
                     />
                   </button>
                 </div>
               </div>
             </div>
             {img.isMain && (
-              <span className="absolute top-1 left-1 bg-blue-700 text-white text-xs px-2 py-0.5 rounded">
+              <span className="absolute top-1 left-1 bg-primary text-white text-xs px-2 py-0.5 rounded">
                 Główne
               </span>
             )}
@@ -96,7 +98,7 @@ export default function ImageUploader({ images, setImages }) {
           <div
             key={i}
             onClick={() => inputRef.current.click()}
-            className="aspect-square border-2 border-dashed rounded flex flex-col items-center justify-center cursor-pointer text-gray-400 hover:bg-zinc-800"
+            className="aspect-square border-2 border-dashed rounded flex flex-col items-center justify-center cursor-pointer text-gray-400 hover:bg-bg_accent"
           >
             <FontAwesomeIcon icon={faUpload} size={22} />
             <span className="text-xs mt-1">Dodaj</span>

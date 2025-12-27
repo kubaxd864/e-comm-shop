@@ -43,9 +43,9 @@ export default function Contact() {
   }
 
   return (
-    <main className="flex flex-1 flex-col w-full items-center p-10 bg-white dark:bg-black">
+    <main className="flex flex-1 flex-col w-full items-center p-10 ">
       <h1 className="text-3xl font-bold text-center mb-8">Kontakt do Nas</h1>
-      <div className="flex flex-col w-8/12 bg-zinc-900 p-8 rounded-lg gap-3">
+      <div className="flex flex-col w-8/12 bg-bg-secondary p-8 rounded-lg gap-3">
         <p>
           Jeśli masz pytania dotyczące zamówień, produktów lub działania serwisu
           – skontaktuj się z nami.
@@ -73,7 +73,7 @@ export default function Contact() {
                   required: "Imię i Nazwisko jest wymagane",
                 })}
                 type="text"
-                className={`flex w-full border border-gray-500 rounded-sm py-2 px-4 ${
+                className={`flex w-full border border-border rounded-sm py-2 px-4 ${
                   errors.name ? "border-red-400" : null
                 }`}
                 placeholder="Imię i nazwisko"
@@ -93,7 +93,7 @@ export default function Contact() {
                   },
                 })}
                 type="text"
-                className={`flex border border-gray-500 rounded-sm py-2 px-4 ${
+                className={`flex border border-border rounded-sm py-2 px-4 ${
                   errors.name ? "border-red-400" : null
                 }`}
                 placeholder="Email"
@@ -110,18 +110,21 @@ export default function Contact() {
                     required: "Wybranie Sklepu jest wymagane",
                   })}
                   defaultValue=""
-                  className={`appearance-none w-full border border-gray-500 rounded-sm py-2 px-4 pr-10 bg-zinc-900 text-gray-400 ${
+                  className={`appearance-none w-full border border-border rounded-sm py-2 px-4 pr-10 bg-bg_secondary text-gray-400 ${
                     errors.shopId ? "border-red-400" : null
                   }`}
                 >
-                  <option value="" className="bg-zinc-900 text-white">
+                  <option
+                    value=""
+                    className="bg-bg_secondary text-text_primary"
+                  >
                     Wybierz placówkę do Kontaktu
                   </option>
                   {shops.map((p) => (
                     <option
                       key={p.id}
                       value={p.id}
-                      className="bg-zinc-900 text-white"
+                      className="bg-bg_secondary text-text_primary"
                     >
                       {p.name}
                     </option>
@@ -140,7 +143,7 @@ export default function Contact() {
                 {...register("subject", {
                   required: "Temat wiadomości jest wymagany",
                 })}
-                className={`flex border border-gray-500 rounded-sm py-2 px-4 ${
+                className={`flex border border-border rounded-sm py-2 px-4 ${
                   errors.subject ? "border-red-400" : null
                 }`}
                 placeholder="Temat wiadomości"
@@ -157,7 +160,7 @@ export default function Contact() {
                 {...register("message", {
                   required: "Nie można wysłać wiadomości bez treści",
                 })}
-                className={`flex border border-gray-500 rounded-sm py-2 px-4 ${
+                className={`flex border border-border rounded-sm py-2 px-4 ${
                   errors.message ? "border-red-400" : null
                 }`}
                 placeholder="Treść wiadomości"
@@ -184,7 +187,7 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-blue-700 py-3 px-12 w-fit rounded-sm"
+                className="bg-primary text-text-secondary py-3 px-12 w-fit rounded-sm cursor-pointer hover:bg-primary-hover"
               >
                 {isSubmitting ? "Wysyłanie" : status !== "" ? status : "Wyślij"}
               </button>

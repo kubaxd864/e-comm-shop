@@ -86,10 +86,10 @@ export default function Myaccount() {
     }
   }
   return (
-    <main className="flex flex-1 w-full flex-col items-center justify-center gap-4 bg-white px-6 py-16 dark:bg-black">
+    <main className="flex flex-1 w-full flex-col items-center justify-center gap-4 px-6 py-16">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col w-full max-w-[700px] gap-8 bg-zinc-950 rounded-sm p-6 m-10"
+        className="flex flex-col w-full max-w-[700px] gap-8 bg-bg-secondary rounded-sm p-6 m-10"
       >
         <div className="flex flex-row justify-between">
           <div className="flex flex-col gap-5 p-4">
@@ -140,12 +140,15 @@ export default function Myaccount() {
           <div className="flex flex-row gap-4 p-2">
             <button
               type="button"
-              className="border border-gray-500 px-6 py-3 rounded-sm"
+              className="border border-border px-6 py-3 rounded-sm"
               onClick={() => openEdit(false)}
             >
               Anuluj
             </button>
-            <button type="submit" className="bg-blue-800 px-6 py-3 rounded-sm">
+            <button
+              type="submit"
+              className="bg-primary text-text-secondary px-6 py-3 rounded-sm cursor-pointer hover:bg-primary-hover"
+            >
               {isSubmitting ? "Zapisywanie..." : "Zapisz"}
             </button>
           </div>

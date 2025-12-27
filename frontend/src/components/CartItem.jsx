@@ -4,7 +4,7 @@ import QuantityNumber from "./QuantityNumber";
 
 export default function CartItem({ id, name, price, quantity, thumbnail }) {
   return (
-    <div className="bg-zinc-900 py-3 rounded-md flex flex-row items-center gap-8">
+    <div className="bg-bg-secondary py-3 rounded-md flex flex-row items-center gap-8">
       {thumbnail ? (
         <img
           src={thumbnail}
@@ -12,10 +12,10 @@ export default function CartItem({ id, name, price, quantity, thumbnail }) {
           className="w-40 h-32 object-contain rounded-md bg-white p-2"
         />
       ) : (
-        <div className="w-40 h-32 bg-zinc-800 rounded-md" />
+        <div className="w-40 h-32 bg-bg-accent rounded-md" />
       )}
       <Link href={`product/${id}`}>
-        <p className="text-lg font-medium max-w-[250px] hover:text-blue-600">
+        <p className="text-lg font-medium max-w-[250px] hover:text-primary-hover">
           {name}
         </p>
       </Link>

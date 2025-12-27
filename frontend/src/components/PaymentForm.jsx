@@ -55,9 +55,9 @@ export default function PaymentForm({ setStep }) {
           layout: { type: "tabs" },
           defaultValues: { paymentMethod: { type: "card" } },
         }}
-        className="w-3/4 bg-zinc-900 rounded-sm p-5"
+        className="w-3/4 bg-bg_secondary rounded-sm p-5"
       />
-      <div className="flex flex-col h-fit w-1/4 min-w-72 gap-2 bg-zinc-900 rounded-sm p-4">
+      <div className="flex flex-col h-fit w-1/4 min-w-72 gap-2 bg-bg-secondary rounded-sm p-4">
         <h1 className="text-xl text-center pb-6">Podsumowanie Zamówienia</h1>
         <div className="flex flex-row w-full justify-between">
           <p>Wartość produktów:</p>
@@ -67,7 +67,7 @@ export default function PaymentForm({ setStep }) {
           <p>Dostawa od:</p>
           <p>{deliverySum.toFixed(2)} zł</p>
         </div>
-        <div className="flex flex-row w-full justify-between border-t-[1.5px] border-gray-400 pt-5">
+        <div className="flex flex-row w-full justify-between border-t-[1.5px] border-border pt-5">
           <p className="flex justify-center items-center">Razem z dostawą:</p>
           <p className="text-2xl">{(itemsSum + deliverySum).toFixed(2)} zł</p>
         </div>
@@ -76,7 +76,7 @@ export default function PaymentForm({ setStep }) {
             type="button"
             onClick={handlePay}
             disabled={isProcessing}
-            className="bg-blue-600 py-3 rounded"
+            className="bg-primary text-text_secondary py-3 rounded hover:bg-primary-hover"
           >
             {isProcessing
               ? "Przetwarzanie…"

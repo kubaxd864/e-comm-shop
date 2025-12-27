@@ -37,8 +37,8 @@ export default function CheckoutForm() {
   };
 
   return (
-    <main className="flex flex-1 w-full justify-center bg-white dark:bg-black">
-      <div className="w-9/12 mt-10">
+    <main className="flex flex-1 w-full justify-center">
+      <div className="w-9/12 my-10">
         <h1 className="text-3xl text-center mb-8">
           {step === 1
             ? "Dane Zamówienia"

@@ -49,9 +49,9 @@ export default function Categories() {
     router.push(`/categories?category=${categoryId}`);
   }
   return (
-    <div className="flex justify-center w-full h-20 p-2 bg-zinc-950 border-t border-b border-t-gray-700 border-b-gray-700">
+    <div className="flex justify-center w-full h-20 p-2 bg-bg-primary border-b border-b-border">
       <div className="flex flex-row gap-9">
-        {categories.map(({ id, name, icon, slug }) => (
+        {categories.map(({ id, name, icon }) => (
           <div
             key={id}
             onClick={() => searchByCategory(id)}
