@@ -1,12 +1,11 @@
 "use client";
-import axios from "axios";
+import { fetcher } from "@/lib/fetcher";
 import useSWRInfinite from "swr/infinite";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import FilterSideBar from "@/components/FilterSidebar";
 import ProductBox from "@/components/ProductBox";
 
-const fetcher = (url) => axios.get(url).then((r) => r.data);
 const PAGE_SIZE = 20;
 
 export default function Category() {

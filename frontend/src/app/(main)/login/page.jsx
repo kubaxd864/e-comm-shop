@@ -5,12 +5,12 @@ import { useForm } from "react-hook-form";
 import { TextField, Checkbox } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ToastProvider";
-import { useUser } from "@/components/UserProvider";
+import { useUser } from "@/hooks/useUser";
 import { useIsDark } from "@/hooks/useIsDark";
 
 export default function Login() {
   const { addToast } = useToast();
-  const { isDark } = useIsDark();
+  const isDark = useIsDark();
   const router = useRouter();
   const { refreshUser } = useUser();
   const {

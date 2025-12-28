@@ -1,13 +1,10 @@
 "use client";
 import { useMemo } from "react";
-import api from "@/lib/axios";
+import { fetcher } from "@/lib/fetcher";
 import useSWR from "swr";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBoxOpen } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-
-const fetcher = (url) =>
-  api.get(url, { withCredentials: true }).then((res) => res.data);
 
 export default function Myorders() {
   const { data, error, isLoading } = useSWR(

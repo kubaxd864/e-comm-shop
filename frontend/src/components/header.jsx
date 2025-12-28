@@ -9,13 +9,13 @@ import { faStar, faUser } from "@fortawesome/free-regular-svg-icons";
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useUser } from "./UserProvider";
+import { useUser } from "@/hooks/useUser";
 import { useToast } from "./ToastProvider";
 import ThemeToggle from "./ThemeSwitch";
 import { useState, useRef } from "react";
 
 export default function Header() {
-  const { user, refreshUser } = useUser();
+  const { user, isAdmin, refreshUser } = useUser();
   const { addToast } = useToast();
   const [openMenu, setOpenMenu] = useState(false);
   const router = useRouter();
@@ -28,8 +28,8 @@ export default function Header() {
         {},
         { withCredentials: true }
       );
+      await refreshUser(null, { revalidate: false });
       addToast(res.data?.message, "success");
-      await refreshUser();
       router.push("/");
     } catch (err) {
       console.error(err);
@@ -110,7 +110,7 @@ export default function Header() {
                 <p className="flex justify-center items-center">Tryb: </p>
                 <ThemeToggle />
               </div>
-              {user.role === "admin" ? (
+              {isAdmin ? (
                 <Link href={"/admin_panel"}>
                   <p>Panel Administratora</p>
                 </Link>

@@ -16,7 +16,7 @@ import { useIsDark } from "@/hooks/useIsDark";
 
 export default function Register() {
   const { addToast } = useToast();
-  const { isDark } = useIsDark();
+  const isDark = useIsDark();
   const {
     register,
     handleSubmit,

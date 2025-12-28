@@ -2,9 +2,8 @@ import useSWR from "swr";
 import api from "@/lib/axios";
 import { useToast } from "@/components/ToastProvider";
 import { useMemo } from "react";
-import { useUser } from "@/components/UserProvider";
-
-const fetcher = (url) => api.get(url).then((res) => res.data);
+import { useUser } from "./useUser";
+import { fetcher } from "@/lib/fetcher";
 
 export function useCart() {
   const { user } = useUser();
@@ -39,7 +38,7 @@ export function useCart() {
   async function addToCart(productId) {
     try {
       const res = await api.post(`http://localhost:5000/api/cart/${productId}`);
-      mutate();
+      await mutate();
       addToast(res.data.message, "info");
     } catch (err) {
       !!user ? addToast(err.response?.data?.message ?? "Błąd", "error") : null;
@@ -51,7 +50,7 @@ export function useCart() {
       const res = await api.post(
         `http://localhost:5000/api/cart/lowerquantity/${productId}`
       );
-      mutate();
+      await mutate();
       addToast(res.data.message, "info");
     } catch (err) {
       addToast(err.response?.data?.message ?? "Błąd", "error");
@@ -63,7 +62,7 @@ export function useCart() {
       const res = await api.delete(
         `http://localhost:5000/api/cart/${productId}`
       );
-      mutate();
+      await mutate();
       addToast(res.data.message, "info");
     } catch (err) {
       addToast(err.response?.data?.message ?? "Błąd", "error");

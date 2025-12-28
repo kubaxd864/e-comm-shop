@@ -47,7 +47,7 @@ export default function Basket() {
                 </div>
               ))}
             </div>
-            <div className="flex flex-col h-fit w-[25%] min-w-72 gap-2 bg-bg_secondary rounded-sm p-4">
+            <div className="flex flex-col h-fit w-[25%] min-w-72 gap-2 bg-bg-secondary rounded-sm p-4">
               <div className="flex flex-row w-full justify-between">
                 <p>Wartość produktów:</p>
                 <p>{itemsSum.toFixed(2)} zł</p>

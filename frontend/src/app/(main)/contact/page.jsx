@@ -2,11 +2,10 @@
 import { useState } from "react";
 import { Checkbox } from "@mui/material";
 import { useSearchParams } from "next/navigation";
+import { fetcher } from "@/lib/fetcher";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import useSWR from "swr";
-
-const fetcher = (url) => axios.get(url).then((r) => r.data);
 
 export default function Contact() {
   const searchParams = useSearchParams();

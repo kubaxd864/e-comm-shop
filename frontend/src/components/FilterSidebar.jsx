@@ -112,7 +112,7 @@ export default function FilterSideBar({ categories, stores }) {
       </div>
       {categories.length !== 0 ? (
         <>
-          <h1 className="text-2xl">Kategorie</h1>
+          <h1 className="text-2xl">Podkategorie</h1>
           <div className="flex flex-col gap-2">
             {categories?.map((category, idx) => (
               <div

@@ -25,6 +25,8 @@ const {
   deleteFromCloudinary,
   calculateDeliverySum,
   requireAuth,
+  requireAdmin,
+  requireOwner,
 } = require("./functions");
 const app = express();
 const PORT = 5000;
@@ -144,6 +146,12 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
       return res.status(401).json({ message: "Niepoprawne Dane Logowania" });
     }
 
+    if (!user.is_active) {
+      return res.status(403).json({
+        message: "Twoje konto zostało zablokowane",
+      });
+    }
+
     req.session.regenerate((err) => {
       if (err) {
         console.error("Błąd Sesji", err);
@@ -184,15 +192,12 @@ app.post("/api/auth/logout", async (req, res) => {
   }
 });
 
-app.get("/api/me", requireAuth, async (req, res) => {
+app.get("/api/me", async (req, res) => {
   try {
     const [rows] = await promisePool.query(
       "SELECT id, name, surname, email, role, phone, county, postcode, city, adress FROM users WHERE id = ?",
       [req.session.userId]
     );
-    if (!rows[0])
-      return res.status(404).json({ message: "Nie znaleziono Użytkownika" });
-
     return res.json({ user: rows[0] });
   } catch (err) {
     console.error(err);
@@ -247,7 +252,7 @@ app.get("/api/get_product/data/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await promisePool.query(
-      `SELECT p.name, p.description, p.item_condition, p.price, p.quantity, p.size, p.created_at, 
+      `SELECT p.name, p.description, p.item_condition, p.price, p.quantity, p.size, p.created_at, p.is_active, 
       c.id AS category_id, c.name AS category_name, c.slug AS category_slug, s.id AS shop_id,
       s.name AS shop_name, s.email AS shop_email, s.phone AS shop_phone, s.address AS shop_address, s.city AS shop_city,
       GROUP_CONCAT(img.file_path SEPARATOR '||') AS images, MAX(CASE WHEN img.is_main = 1 THEN img.file_path END) AS thumbnail
@@ -258,6 +263,9 @@ app.get("/api/get_product/data/:id", async (req, res) => {
       WHERE p.id = ?`,
       [id]
     );
+    if (rows[0].is_active == 0) {
+      return res.status(404).json({ message: "Nie znaleziono produktu" });
+    }
     if (!rows[0])
       return res.status(404).json({ message: "Nie znaleziono produktu" });
     return res.json({ product: rows[0] });
@@ -271,7 +279,7 @@ app.get("/api/get_simular_products", async (req, res) => {
   const { category_id, id } = req.query;
   try {
     const [rows] = await promisePool.query(
-      `SELECT p.id, p.name, p.price, img.file_path FROM products p LEFT JOIN product_images img ON img.product_id = p.id AND img.is_main WHERE p.category_id = ? AND p.id != ?`,
+      `SELECT p.id, p.name, p.price, img.file_path FROM products p LEFT JOIN product_images img ON img.product_id = p.id AND img.is_main WHERE p.category_id = ? AND p.id != ? AND p.is_active`,
       [category_id, id]
     );
     return res.json({ products: rows });
@@ -291,7 +299,7 @@ app.get("/api/favorites", requireAuth, async (req, res) => {
      ON img.product_id = p.id AND img.is_main
      LEFT JOIN stores s
      ON s.id = p.store_id
-     WHERE f.user_id = ?
+     WHERE f.user_id = ? AND p.is_active
      ORDER BY f.created_at DESC`,
       [req.session.userId]
     );
@@ -568,7 +576,7 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
-app.get("/api/admin_data", async (req, res) => {
+app.get("/api/admin_data", requireAdmin, async (req, res) => {
   try {
     const [sum] = await promisePool.query(
       `SELECT SUM(total_amount) AS total_sum FROM orders`
@@ -613,66 +621,71 @@ app.get("/api/admin_data", async (req, res) => {
   }
 });
 
-app.post("/api/admin/add_product", upload.array("images"), async (req, res) => {
-  try {
-    const {
-      product_name,
-      category,
-      description,
-      quantity,
-      size,
-      shop,
-      condition,
-      price,
-      imageIsMain,
-    } = req.body;
-    const [weight, width, height, length] = size.split("/").map(Number);
-    const result = {
-      weight: weight,
-      width: width,
-      height: height,
-      length: length,
-    };
-    const [product] = await promisePool.query(
-      "INSERT INTO products (name, category_id, description, quantity, size, store_id, item_condition, price, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      [
+app.post(
+  "/api/admin/add_product",
+  requireAdmin,
+  upload.array("images"),
+  async (req, res) => {
+    try {
+      const {
         product_name,
         category,
         description,
         quantity,
-        JSON.stringify(result),
+        size,
         shop,
         condition,
         price,
-        req.session.userId,
-      ]
-    );
-    const productId = product.insertId;
-    const uploadedImages = req.files?.length
-      ? await Promise.all(
-          req.files.map((file) =>
-            uploadToCloudinary(file, `products/${productId}`)
+        imageIsMain,
+      } = req.body;
+      const [weight, width, height, length] = size.split("/").map(Number);
+      const result = {
+        weight: weight,
+        width: width,
+        height: height,
+        length: length,
+      };
+      const [product] = await promisePool.query(
+        "INSERT INTO products (name, category_id, description, quantity, size, store_id, item_condition, price, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [
+          product_name,
+          category,
+          description,
+          quantity,
+          JSON.stringify(result),
+          shop,
+          condition,
+          price,
+          req.session.userId,
+        ]
+      );
+      const productId = product.insertId;
+      const uploadedImages = req.files?.length
+        ? await Promise.all(
+            req.files.map((file) =>
+              uploadToCloudinary(file, `products/${productId}`)
+            )
           )
-        )
-      : [];
-    const imagesToInsert = uploadedImages.map((item, idx) => [
-      productId,
-      item.url,
-      imageIsMain[idx],
-      `Zdjęcie Produktu`,
-    ]);
-    await promisePool.query(
-      "INSERT INTO product_images (product_id, file_path, is_main, alt_text) VALUES ?",
-      [imagesToInsert]
-    );
-    res.status(200).json({ message: "Dodano" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Błąd Dodawania" });
+        : [];
+      const imagesToInsert = uploadedImages.map((item, idx) => [
+        productId,
+        item.url,
+        imageIsMain[idx],
+        `Zdjęcie Produktu`,
+      ]);
+      await promisePool.query(
+        "INSERT INTO product_images (product_id, file_path, is_main, alt_text) VALUES ?",
+        [imagesToInsert]
+      );
+      res.status(200).json({ message: "Dodano" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Błąd Dodawania" });
+    }
   }
-});
+);
 
-app.get("/api/admin/get_products", async (req, res) => {
+app.get("/api/admin/get_products", requireAdmin, async (req, res) => {
   try {
     const products = await fetchLatestProducts();
     res.json({ products });
@@ -682,7 +695,7 @@ app.get("/api/admin/get_products", async (req, res) => {
   }
 });
 
-app.put("/api/admin/delete_product/:id", async (req, res) => {
+app.put("/api/admin/delete_product/:id", requireAdmin, async (req, res) => {
   try {
     await promisePool.query(
       `UPDATE products
@@ -699,6 +712,7 @@ app.put("/api/admin/delete_product/:id", async (req, res) => {
 
 app.put(
   "/api/admin/update_product/:id",
+  requireAdmin,
   upload.array("images"),
   async (req, res) => {
     try {
@@ -723,7 +737,6 @@ app.put(
         height: height,
         length: length,
       };
-      console.log(req.body);
       await promisePool.query(
         `UPDATE products
         SET name = ?, category_id = ?, description = ?, quantity = ?, size = ?, store_id = ?, item_condition = ?, price = ?
@@ -785,7 +798,7 @@ app.put(
   }
 );
 
-app.get("/api/admin/orders", async (req, res) => {
+app.get("/api/admin/orders", requireAdmin, async (req, res) => {
   try {
     const orders = await fetchOrders();
     res.json({ orders });
@@ -795,13 +808,94 @@ app.get("/api/admin/orders", async (req, res) => {
   }
 });
 
-app.put("/api/admin/order_status", async (req, res) => {
+app.put("/api/admin/update_order_status", requireAdmin, async (req, res) => {
   try {
     const { id, status } = req.body;
     await promisePool.query("UPDATE orders SET status = ? WHERE id = ?", [
       status,
       id,
     ]);
+    res.status(200).json({ message: "Zaktualizowano" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Błąd podczas Aktualizacji" });
+  }
+});
+
+app.get("/api/admin/users", requireAdmin, async (req, res) => {
+  try {
+    const [users] = await promisePool.query(
+      `SELECT id, name, surname, email, role, is_active, phone, county, postcode, city, adress, created_at
+      FROM users ORDER BY CASE role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 ELSE 2 END, created_at DESC`
+    );
+    res.json({ users });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Błąd podczas Aktualizacji" });
+  }
+});
+
+app.put("/api/admin/update_user_status", requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.body;
+    await promisePool.query(
+      "UPDATE users SET is_active = NOT is_active WHERE id = ?",
+      [id]
+    );
+    res.status(200).json({ message: "Zaktualizowano" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Błąd podczas Aktualizacji" });
+  }
+});
+
+app.put("/api/admin/update_privilages", requireOwner, async (req, res) => {
+  try {
+    const { id } = req.body;
+    const [rows] = await promisePool.query(
+      "SELECT role FROM users WHERE id = ?",
+      [id]
+    );
+    const currentRole = rows[0]?.role;
+    if (currentRole === "owner") {
+      return res
+        .status(400)
+        .json({ message: "Nie można zmienić roli właściciela" });
+    }
+    const nextRole = currentRole === "user" ? "admin" : "user";
+    await promisePool.query("UPDATE users SET role = ? WHERE id = ?", [
+      nextRole,
+      id,
+    ]);
+    res.status(200).json({ message: "Zaktualizowano" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Błąd podczas Aktualizacji" });
+  }
+});
+
+app.post("/api/admin/add_category", requireAdmin, async (req, res) => {
+  try {
+    const { name, slug, parent_id } = req.body;
+    await promisePool.query(
+      "INSERT INTO categories (name, slug, parent_id) VALUES (?, ?, ?)",
+      [name, slug, parent_id]
+    );
+    res.status(200).json({ message: "Zaktualizowano" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Błąd podczas Aktualizacji" });
+  }
+});
+
+app.put("/api/admin/delete_category", requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.body;
+    console.log(id);
+    // await promisePool.query(
+    //   "INSERT INTO categories (name, slug, parent_id) VALUES (?, ?, ?)",
+    //   [name, slug, parent_id]
+    // );
     res.status(200).json({ message: "Zaktualizowano" });
   } catch (err) {
     console.error(err);

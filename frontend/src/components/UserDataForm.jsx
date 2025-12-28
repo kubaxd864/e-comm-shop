@@ -1,6 +1,6 @@
 "use client";
 import { Checkbox } from "@mui/material";
-import { useUser } from "./UserProvider";
+import { useUser } from "@/hooks/useUser";
 import { useFormContext } from "react-hook-form";
 import { useState, useEffect } from "react";
 

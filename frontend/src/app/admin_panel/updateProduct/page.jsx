@@ -8,8 +8,7 @@ import { useForm } from "react-hook-form";
 import ProductDetailsForm from "@/components/ProductDetailsForm";
 import ProductDescription from "@/components/ProductDescription";
 import ImageUploader from "@/components/AddImages";
-
-const fetcher = (url) => axios.get(url).then((r) => r.data);
+import { fetcher } from "@/lib/fetcher";
 
 export default function UpdateProduct() {
   const searchParams = useSearchParams();

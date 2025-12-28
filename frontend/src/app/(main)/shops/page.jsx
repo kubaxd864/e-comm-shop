@@ -1,10 +1,8 @@
 "use client";
-import axios from "axios";
 import useSWR from "swr";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
-const fetcher = (url) => axios.get(url).then((r) => r.data);
+import { fetcher } from "@/lib/fetcher";
 
 export default function Shops() {
   const router = useRouter();

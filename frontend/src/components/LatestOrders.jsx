@@ -33,7 +33,7 @@ export default function LatestOrders({ orders }) {
                 </td>
                 <td className="px-6 py-4.5">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${
                       statusStyles[order.status]
                     }`}
                   >

@@ -7,7 +7,7 @@ import DeliveryOptions from "@/components/DeliveryOptions";
 import Summary from "@/components/Summary";
 import Payment from "@/components/Payment";
 import axios from "axios";
-import { useUser } from "@/components/UserProvider";
+import { useUser } from "@/hooks/useUser";
 
 export default function CheckoutForm() {
   const methods = useForm();

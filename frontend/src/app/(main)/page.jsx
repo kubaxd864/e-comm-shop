@@ -2,10 +2,9 @@
 import Categories from "@/components/Categories";
 import ProductBox from "@/components/ProductBox";
 import useSWRInfinite from "swr/infinite";
-import axios from "axios";
+import { fetcher } from "@/lib/fetcher";
 import { useCallback, useEffect } from "react";
 
-const fetcher = (url) => axios.get(url).then((res) => res.data);
 const PAGE_SIZE = 20;
 
 export default function Home() {

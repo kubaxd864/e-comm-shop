@@ -1,15 +1,13 @@
 import useSWR from "swr";
 import api from "@/lib/axios";
-import { useUser } from "@/components/UserProvider";
+import { useUser } from "./useUser";
 import { useToast } from "@/components/ToastProvider";
-
-const fetcher = (url) =>
-  api.get(url, { withCredentials: true }).then((res) => res.data);
+import { fetcher } from "@/lib/fetcher";
 
 export function useFavorites() {
   const { user } = useUser();
   const { addToast } = useToast();
-  const { data, error, mutate } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     !!user ? "http://localhost:5000/api/favorites" : null,
     fetcher
   );
@@ -39,7 +37,7 @@ export function useFavorites() {
   }
   return {
     favorites: data?.favorites ?? [],
-    isLoading: !data && !error,
+    isLoading: isLoading,
     isError: !!error,
     toggleFavorite,
     mutate,

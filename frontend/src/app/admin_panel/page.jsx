@@ -5,9 +5,7 @@ import LatestProducts from "@/components/LatestProducts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMoneyBill, faCoins } from "@fortawesome/free-solid-svg-icons";
 import useSWR from "swr";
-import axios from "axios";
-
-const fetcher = (url) => axios.get(url).then((r) => r.data);
+import { fetcher } from "@/lib/fetcher";
 
 export default function AdminPanel() {
   const { data } = useSWR(`http://localhost:5000/api/admin_data`, fetcher);

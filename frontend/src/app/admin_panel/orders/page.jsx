@@ -5,13 +5,13 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/components/ToastProvider";
+import { fetcher } from "@/lib/fetcher";
 
-const fetcher = (url) => axios.get(url).then((r) => r.data);
 const statusStyles = {
-  opłacone: "bg-orange-100 text-orange-700",
-  potwierdzone: "bg-yellow-100 text-yellow-700",
-  wysłane: "bg-green-100 text-green-700",
-  anulowane: "bg-red-100 text-red-700",
+  opłacone: "bg-orange-400/10 text-orange-500",
+  potwierdzone: "bg-yellow-500/10 text-yellow-500",
+  wysłane: "bg-green-500/10 text-green-500",
+  anulowane: "bg-red-500/10 text-red-600",
 };
 const statusOptions = ["opłacone", "potwierdzone", "wysłane", "anulowane"];
 
@@ -26,8 +26,9 @@ export default function Orders() {
   async function UpdateOrderStatus(id, status) {
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/admin/order_status`,
-        { id, status }
+        `http://localhost:5000/api/admin/update_order_status`,
+        { id, status },
+        { withCredentials: true }
       );
       setEditingId(null);
       mutate();
@@ -54,7 +55,7 @@ export default function Orders() {
             return (
               <div
                 key={order.id}
-                className="flex justify-around items-center gap-6 p-4 rounded text-lg border border-border bg-bg-secondary"
+                className="flex justify-around items-center gap-6 p-4 rounded border border-border bg-bg-secondary"
               >
                 <p className="font-semibold">{order.id}</p>
                 <p>{order.name + " " + order.surname}</p>
@@ -62,7 +63,7 @@ export default function Orders() {
                 <p>{order.created_at.split("T")[0]}</p>
                 {!isEditing ? (
                   <p
-                    className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                    className={`px-3 py-1 rounded text-xs font-medium capitalize ${
                       statusStyles[order.status]
                     }`}
                   >

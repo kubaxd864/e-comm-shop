@@ -1,5 +1,5 @@
 "use client";
-import { useUser } from "@/components/UserProvider";
+import { useUser } from "@/hooks/useUser";
 import { useToast } from "@/components/ToastProvider";
 import { useForm } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

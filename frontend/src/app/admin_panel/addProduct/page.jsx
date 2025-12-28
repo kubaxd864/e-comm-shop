@@ -6,8 +6,7 @@ import ProductDescription from "@/components/ProductDescription";
 import React, { useState } from "react";
 import useSWR from "swr";
 import axios from "axios";
-
-const fetcher = (url) => axios.get(url).then((r) => r.data);
+import { fetcher } from "@/lib/fetcher";
 
 export default function AddProduct() {
   const { data } = useSWR(`http://localhost:5000/api/get_stores`, fetcher);

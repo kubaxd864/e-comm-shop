@@ -11,8 +11,7 @@ import useSWR from "swr";
 import axios from "axios";
 import { useToast } from "@/components/ToastProvider";
 import { useRouter } from "next/navigation";
-
-const fetcher = (url) => axios.get(url).then((r) => r.data);
+import { fetcher } from "@/lib/fetcher";
 
 export default function Products() {
   const { addToast } = useToast();
@@ -26,7 +25,9 @@ export default function Products() {
   async function DeleteProduct(id) {
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/admin/delete_product/${id}`
+        `http://localhost:5000/api/admin/delete_product/${id}`,
+        {},
+        { withCredentials: true }
       );
       mutate();
       addToast(res.data.message, "info");
