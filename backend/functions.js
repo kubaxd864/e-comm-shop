@@ -203,7 +203,7 @@ async function fetchProducts(query) {
     where.push(`
         p.category_id IN (
           SELECT id FROM categories
-          WHERE id = ? OR parent_id = ?
+          WHERE id = ? OR parent_id = ? AND is_active
         )
       `);
     params.push(Number(category), Number(category));
@@ -244,7 +244,7 @@ async function fetchProducts(query) {
 
 async function fetchCategories(query) {
   const { name, category } = query;
-  const where = [];
+  const where = ["c.is_active"];
   const params = [];
 
   if (name) {

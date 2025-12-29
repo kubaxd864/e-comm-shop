@@ -38,7 +38,6 @@ export default function Categories() {
       slug: "realestate",
     },
     { id: 12, name: "Sport i Rekreacja", icon: faVolleyball, slug: "sport" },
-    { id: 13, name: "SuperMarket", icon: faCartShopping, slug: "supermarket" },
     { id: 14, name: "Uroda", icon: faFireExtinguisher, slug: "beauty" },
     { id: 15, name: "Zdrowie", icon: faKitMedical, slug: "health" },
     { id: 16, name: "Promocje", icon: faPercent, slug: "sales" },
@@ -49,16 +48,16 @@ export default function Categories() {
     router.push(`/categories?category=${categoryId}`);
   }
   return (
-    <div className="flex justify-center w-full h-20 p-2 bg-bg-primary border-b border-b-border">
-      <div className="flex flex-row gap-9">
+    <div className="flex justify-center w-full px-4 py-4 bg-bg-primary border-b border-border">
+      <div className="grid w-full max-w-[1700px] grid-cols-[repeat(auto-fit,minmax(105px,1fr))] gap-6 justify-items-center">
         {categories.map(({ id, name, icon }) => (
           <div
             key={id}
             onClick={() => searchByCategory(id)}
-            className="flex flex-col items-center justify-center gap-2 text-center cursor-pointer"
+            className="flex flex-col items-center gap-2 text-center cursor-pointer max-w-[140px]"
           >
-            <FontAwesomeIcon icon={icon} className="h-5! w-5!" />
-            <p className="text-sm">{name}</p>
+            <FontAwesomeIcon icon={icon} className="w-5 h-5 shrink-0" />
+            <p className="text-sm truncate w-full">{name}</p>
           </div>
         ))}
       </div>

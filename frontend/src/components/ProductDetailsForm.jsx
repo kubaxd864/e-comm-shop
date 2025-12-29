@@ -16,7 +16,6 @@ export default function ProductDetailsForm({ form, categories, shops }) {
           Dane produktu dostępne dla klienta.
         </p>
       </div>
-
       <div className="flex flex-col gap-2">
         <label>Nazwa Produktu</label>
         <input
@@ -32,9 +31,8 @@ export default function ProductDetailsForm({ form, categories, shops }) {
           <p className="text-sm text-red-400">{errors.product_name.message}</p>
         )}
       </div>
-
-      <div className="flex flex-row gap-5">
-        <div className="flex flex-col gap-2 w-1/2">
+      <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col gap-2 w-full md:w-1/2">
           <label>Kategoria</label>
           <select
             {...register("category", {
@@ -58,8 +56,7 @@ export default function ProductDetailsForm({ form, categories, shops }) {
             <p className="text-sm text-red-400">{errors.category.message}</p>
           )}
         </div>
-
-        <div className="flex flex-col gap-2 w-1/2">
+        <div className="flex flex-col gap-2 w-full md:w-1/2">
           <label>Stan</label>
           <select
             {...register("condition", { required: "Wybierz stan produktu" })}
@@ -91,9 +88,8 @@ export default function ProductDetailsForm({ form, categories, shops }) {
           )}
         </div>
       </div>
-
-      <div className="flex flex-row gap-5">
-        <div className="flex flex-col gap-2 w-3/4">
+      <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col gap-2 w-full md:w-3/4">
           <label>Wymiary</label>
           <input
             {...register("size", {
@@ -111,8 +107,7 @@ export default function ProductDetailsForm({ form, categories, shops }) {
             <p className="text-sm text-red-400">{errors.size.message}</p>
           )}
         </div>
-
-        <div className="flex flex-col gap-2 w-1/4">
+        <div className="flex flex-col gap-2 w-full md:w-1/4">
           <label>Ilość</label>
           <input
             type="number"
@@ -127,9 +122,8 @@ export default function ProductDetailsForm({ form, categories, shops }) {
           )}
         </div>
       </div>
-
-      <div className="flex flex-row gap-5">
-        <div className="flex flex-col gap-2 w-1/2">
+      <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col gap-2 w-full md:w-1/2">
           <label>Sklep</label>
           <select
             {...register("shop", { required: "Wybierz sklep" })}
@@ -157,8 +151,7 @@ export default function ProductDetailsForm({ form, categories, shops }) {
             <p className="text-sm text-red-400">{errors.shop.message}</p>
           )}
         </div>
-
-        <div className="flex flex-col gap-2 w-1/2">
+        <div className="flex flex-col gap-2 w-full md:w-1/2">
           <label>Cena</label>
           <input
             type="number"

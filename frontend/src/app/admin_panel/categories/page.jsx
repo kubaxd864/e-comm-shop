@@ -2,12 +2,16 @@
 import { fetcher } from "@/lib/fetcher";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import useSWR from "swr";
 import axios from "axios";
 import { useToast } from "@/components/ToastProvider";
 
 const INDENT_STEP = 20;
+const statusStyles = {
+  1: "bg-green-500/10 text-green-500",
+  0: "bg-red-500/10 text-red-600",
+};
 
 export default function Categories() {
   const [editedId, setEditedId] = useState(null);
@@ -25,32 +29,43 @@ export default function Categories() {
       <div key={node.id} className="flex flex-col gap-3">
         <div className="rounded border border-border bg-bg-secondary">
           <div
-            className="flex items-center justify-between p-4"
+            className="grid grid-cols-1 sm:grid-cols-2 items-center p-4 gap-3"
             style={{ paddingLeft: `${indent}px` }}
           >
             <p className="flex flex-row gap-2 text-sm font-medium ">
               <span>{depth > 0 && "↳ "}</span>
               <span>{node.name}</span>
             </p>
-            <div className="flex items-center gap-3 text-text-secondary">
-              <button
-                type="button"
-                onClick={() =>
-                  setEditedId((prev) => (prev === node.id ? null : node.id))
-                }
-                className="text-sm cursor-pointer"
+            <div className="flex items-center gap-3 text-text-secondary sm:ml-auto">
+              <p
+                className={`px-3 py-1 rounded text-xs font-medium capitalize text-center ${
+                  statusStyles[node.is_active]
+                }`}
               >
-                <FontAwesomeIcon icon={faPlus} />
-              </button>
-              {node.parent_id !== null ? (
+                {node.is_active ? "Aktywna" : "Niewidoczna"}
+              </p>
+              <div className="flex gap-3 min-w-12">
                 <button
                   type="button"
-                  onClick={() => deleteCategory(node.id)}
-                  className="text-sm cursor-pointer"
+                  onClick={() =>
+                    setEditedId((prev) => (prev === node.id ? null : node.id))
+                  }
+                  className="text-sm cursor-pointer ml-auto"
                 >
-                  <FontAwesomeIcon icon={faTrash} />
+                  <FontAwesomeIcon icon={faPlus} />
                 </button>
-              ) : null}
+                {node.parent_id !== null ? (
+                  <button
+                    type="button"
+                    onClick={() => deleteCategory(node.id)}
+                    className="text-sm cursor-pointer"
+                  >
+                    <FontAwesomeIcon
+                      icon={node.is_active ? faEyeSlash : faEye}
+                    />
+                  </button>
+                ) : null}
+              </div>
             </div>
           </div>
           {isEdited ? (
@@ -96,7 +111,7 @@ export default function Categories() {
   async function deleteCategory(id) {
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/admin/delete_category`,
+        `http://localhost:5000/api/admin/update_category_status`,
         { id },
         { withCredentials: true }
       );
@@ -112,7 +127,7 @@ export default function Categories() {
       <div className="flex flex-row w-full md:w-10/12 lg:w-8/12 xl:w-6/12">
         <h1 className="text-3xl font-semibold">Kategorie</h1>
       </div>
-      <div className="flex flex-col p-10 gap-6 w-full md:w-10/12 lg:w-8/12 xl:w-6/12 max-h-[630px] overflow-auto hide-scrollbar bg-bg-secondary rounded-lg">
+      <div className="flex flex-col p-4 md:p-10 gap-6 w-full md:w-10/12 lg:w-8/12 xl:w-6/12 max-h-[85vh] overflow-auto hide-scrollbar bg-bg-secondary rounded-lg">
         {isLoading ? (
           <p className="w-full text-center">Wczytywanie danych....</p>
         ) : error ? (

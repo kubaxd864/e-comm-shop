@@ -238,7 +238,10 @@ app.get("/api/get_products", async (req, res) => {
         ON img.product_id = p.id AND img.is_main
        LEFT JOIN stores s
         ON s.id = p.store_id
-       WHERE p.is_active = 1
+       LEFT JOIN categories c 
+        ON c.id = p.category_id
+       WHERE p.is_active = 1 AND c.is_active
+       ORDER BY p.created_at
        LIMIT ${limit} OFFSET ${offset}`
     );
     return res.json({ products: rows });
@@ -253,7 +256,7 @@ app.get("/api/get_product/data/:id", async (req, res) => {
   try {
     const [rows] = await promisePool.query(
       `SELECT p.name, p.description, p.item_condition, p.price, p.quantity, p.size, p.created_at, p.is_active, 
-      c.id AS category_id, c.name AS category_name, c.slug AS category_slug, s.id AS shop_id,
+      c.id AS category_id, c.name AS category_name, c.slug AS category_slug, c.is_active AS category_active, s.id AS shop_id,
       s.name AS shop_name, s.email AS shop_email, s.phone AS shop_phone, s.address AS shop_address, s.city AS shop_city,
       GROUP_CONCAT(img.file_path SEPARATOR '||') AS images, MAX(CASE WHEN img.is_main = 1 THEN img.file_path END) AS thumbnail
       FROM products p
@@ -263,11 +266,12 @@ app.get("/api/get_product/data/:id", async (req, res) => {
       WHERE p.id = ?`,
       [id]
     );
-    if (rows[0].is_active == 0) {
+    if (rows[0].is_active == 0 || rows[0].category_active == 0) {
       return res.status(404).json({ message: "Nie znaleziono produktu" });
     }
     if (!rows[0])
       return res.status(404).json({ message: "Nie znaleziono produktu" });
+
     return res.json({ product: rows[0] });
   } catch (err) {
     console.error(err);
@@ -551,7 +555,7 @@ app.get("/api/products", async (req, res) => {
 app.get("/api/get_stores", async (req, res) => {
   const stores = await fetchStores();
   const [categories] = await promisePool.query(
-    "SELECT id, name, parent_id FROM categories"
+    "SELECT id, name, parent_id, is_active FROM categories"
   );
   const tree = buildCategoryTree(categories);
   res.json({ stores, categories: tree });
@@ -703,7 +707,7 @@ app.put("/api/admin/delete_product/:id", requireAdmin, async (req, res) => {
        WHERE id = ?`,
       [req.params.id]
     );
-    return res.json({ message: "Ukryto Produkt" });
+    return res.json({ message: "Zaktualizowano" });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Błąd podczas Usuwania" });
@@ -888,14 +892,13 @@ app.post("/api/admin/add_category", requireAdmin, async (req, res) => {
   }
 });
 
-app.put("/api/admin/delete_category", requireAdmin, async (req, res) => {
+app.put("/api/admin/update_category_status", requireAdmin, async (req, res) => {
   try {
     const { id } = req.body;
-    console.log(id);
-    // await promisePool.query(
-    //   "INSERT INTO categories (name, slug, parent_id) VALUES (?, ?, ?)",
-    //   [name, slug, parent_id]
-    // );
+    await promisePool.query(
+      "UPDATE categories SET is_active = NOT is_active WHERE id = ?",
+      [id]
+    );
     res.status(200).json({ message: "Zaktualizowano" });
   } catch (err) {
     console.error(err);

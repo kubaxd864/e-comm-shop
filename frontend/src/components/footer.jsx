@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Footer() {
   return (
-    <footer className="flex flex-row justify-center gap-12 bg-bg-primary border-t border-t-border w-full h-40 p-8">
+    <footer className="flex flex-col lg:flex-row justify-center gap-12 bg-bg-primary border-t border-t-border w-full p-8">
       <Image src="/logo.png" alt="Logo" width={100} height={100} />
       <p className="max-w-[450px]">
         „Nasz sklep internetowy oferuje starannie wyselekcjonowane produkty

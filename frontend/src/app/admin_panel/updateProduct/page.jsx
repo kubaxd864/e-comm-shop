@@ -104,7 +104,7 @@ export default function UpdateProduct() {
       <h1 className="text-3xl font-semibold">Zaktualizuj Produkt</h1>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col p-10 gap-4 w-11/12 lg:w-8/12 bg-bg-secondary rounded-lg"
+        className="flex flex-col p-10 gap-4 w-full md:w-10/12 lg:w-9/12 xl:w-8/12 bg-bg-secondary rounded-lg"
       >
         {!productData ? (
           <div className="p-10 text-center">Ładowanie danych produktu...</div>

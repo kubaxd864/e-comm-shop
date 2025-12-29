@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
 
 export default function LatestProducts({ products }) {
   return (
@@ -31,9 +32,12 @@ export default function LatestProducts({ products }) {
         ))}
       </ul>
       <div className="px-6 py-4 text-right">
-        <button className="text-sm font-medium text-primary cursor-pointer hover:underline">
+        <Link
+          href={"admin_panel/products"}
+          className="text-sm font-medium text-primary cursor-pointer hover:underline"
+        >
           View all →
-        </button>
+        </Link>
       </div>
     </div>
   );

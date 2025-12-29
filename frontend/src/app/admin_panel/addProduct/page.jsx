@@ -53,7 +53,7 @@ export default function AddProduct() {
       <h1 className="text-3xl font-semibold">Dodaj Produkt</h1>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col p-10 gap-4 w-11/12 lg:w-8/12 bg-bg-secondary rounded-lg"
+        className="flex flex-col p-4 md:p-10 gap-4 w-full md:w-10/12 lg:w-9/12 xl:w-8/12 bg-bg-secondary rounded-lg"
       >
         <ProductDetailsForm form={form} categories={categories} shops={shops} />
         <ImageUploader images={images} setImages={setImages} />

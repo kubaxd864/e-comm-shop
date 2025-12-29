@@ -19,7 +19,7 @@ export default function WykresLiniowy({ data = [], title, sum }) {
     : [];
 
   return (
-    <div className="flex flex-col gap-4 p-3.5 w-1/3 bg-bg-secondary rounded-lg">
+    <div className="flex flex-col gap-4 p-3.5 w-full bg-bg-secondary rounded-lg">
       <div className="flex flex-row justify-between">
         <div className="flex flex-col gap-2">
           <h1 className="text-xl font-semibold">{title}</h1>
@@ -27,7 +27,7 @@ export default function WykresLiniowy({ data = [], title, sum }) {
         </div>
         <p className="text-2xl">{sum}</p>
       </div>
-      <div className="w-full">
+      <div className="w-full h-full">
         {hasData ? (
           <ResponsiveContainer width="100%" aspect={2.1}>
             <LineChart data={chartData} margin={{ right: 40 }}>

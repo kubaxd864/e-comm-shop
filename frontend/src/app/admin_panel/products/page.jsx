@@ -16,10 +16,12 @@ import { fetcher } from "@/lib/fetcher";
 export default function Products() {
   const { addToast } = useToast();
   const router = useRouter();
+
   const { data, error, isLoading, mutate } = useSWR(
-    `http://localhost:5000/api/admin/get_products`,
+    "http://localhost:5000/api/admin/get_products",
     fetcher
   );
+
   const products = data?.products ?? [];
 
   async function DeleteProduct(id) {
@@ -32,43 +34,43 @@ export default function Products() {
       mutate();
       addToast(res.data.message, "info");
     } catch (err) {
-      console.error(err);
       addToast(err.response?.data?.message ?? "Błąd", "error");
     }
   }
+
   return (
-    <div className="flex flex-1 w-full flex-col gap-8 items-center px-6 py-12">
-      <div className="flex flex-row w-full md:w-11/12 lg:w-9/12 xl:w-7/12">
+    <div className="flex flex-1 flex-col items-center gap-8 px-6 py-12">
+      <div className="flex gap-3 w-full lg:w-11/12 xl:w-9/12 2xl:w-6/12 items-center">
         <h1 className="text-3xl font-semibold">Produkty</h1>
         <Link
-          href={"/admin_panel/addProduct"}
-          className="flex flex-row gap-2 items-center justify-center ml-auto px-4 py-2 rounded bg-primary text-text-secondary cursor-pointer hover:bg-primary-hover"
+          href="/admin_panel/addProduct"
+          className="ml-auto flex items-center gap-2 text-sm md:text-base rounded bg-primary px-4 py-2 text-text-secondary hover:bg-primary-hover"
         >
           <FontAwesomeIcon icon={faPlus} />
           <span>Dodaj produkt</span>
         </Link>
       </div>
-      <div className="flex flex-col p-10 gap-6 w-full md:w-11/12 lg:w-9/12 xl:w-7/12 max-h-[630px] overflow-auto hide-scrollbar bg-bg-secondary rounded-lg">
+      <div className="flex w-full lg:w-11/12 xl:w-9/12 2xl:w-6/12 flex-col gap-4 rounded-lg bg-bg-secondary p-6 max-h-[85vh] overflow-auto hide-scrollbar">
         {isLoading ? (
-          <p className="w-full text-center">Wczytywanie danych....</p>
+          <p className="text-center">Wczytywanie danych…</p>
         ) : error ? (
-          <p className="w-full text-center">Błąd wczytywania danych</p>
+          <p className="text-center">Błąd wczytywania danych</p>
         ) : (
-          products.map((product, idx) => (
+          products.map((product) => (
             <div
-              key={idx}
-              className="flex items-center gap-6 p-4 rounded border border-border bg-bg-secondary"
+              key={product.id}
+              className="grid grid-cols-1 md:grid-cols-[96px_1fr_auto_auto] gap-4 items-center rounded border border-border bg-bg-secondary p-4"
             >
               <img
                 src={product.thumbnail}
                 alt={product.name ?? "product"}
-                className="w-24 h-18 shrink-0 object-contain rounded-md bg-white"
+                className="h-20 w-24 object-contain rounded bg-white mx-auto md:mx-0"
               />
-              <p className="flex-1 min-w-0 text-lg max-w-2xl break-words">
+              <p className="truncate text-sm md:text-base font-medium">
                 {product.name}
               </p>
-              <div className="flex flex-row justify-center items-center gap-5 ml-auto">
-                <p className="text-lg font-semibold px-3">{product.price} zł</p>
+              <div className="flex md:flex-col items-center md:items-end gap-2">
+                <span className="font-semibold">{product.price} zł</span>
                 <span
                   className={`text-xs px-2 py-1 rounded font-medium ${
                     product.is_active
@@ -78,24 +80,24 @@ export default function Products() {
                 >
                   {product.is_active ? "Aktywny" : "Ukryty"}
                 </span>
-                <div className="flex">
-                  <button
-                    onClick={() =>
-                      router.push(`/admin_panel/updateProduct?id=${product.id}`)
-                    }
-                    className="px-3 py-1 text-sm cursor-pointer text-text-secondary"
-                  >
-                    <FontAwesomeIcon icon={faPenToSquare} />
-                  </button>
-                  <button
-                    onClick={() => DeleteProduct(product.id)}
-                    className="px-3 py-1 text-sm cursor-pointer text-text-secondary"
-                  >
-                    <FontAwesomeIcon
-                      icon={product.is_active ? faEyeSlash : faEye}
-                    />
-                  </button>
-                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() =>
+                    router.push(`/admin_panel/updateProduct?id=${product.id}`)
+                  }
+                  className="p-2 hover:text-primary"
+                >
+                  <FontAwesomeIcon icon={faPenToSquare} />
+                </button>
+                <button
+                  onClick={() => DeleteProduct(product.id)}
+                  className="p-2 hover:text-primary"
+                >
+                  <FontAwesomeIcon
+                    icon={product.is_active ? faEyeSlash : faEye}
+                  />
+                </button>
               </div>
             </div>
           ))
