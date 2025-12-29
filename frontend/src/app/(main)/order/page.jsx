@@ -48,7 +48,10 @@ export default function CheckoutForm() {
         </h1>
 
         <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(submit)} className="flex gap-6">
+          <form
+            onSubmit={methods.handleSubmit(submit)}
+            className="flex flex-col lg:flex-row gap-6"
+          >
             {step === 1 && <UserData />}
             {step === 2 && <DeliveryOptions />}
             {step === 3 && <Payment setStep={setStep} />}

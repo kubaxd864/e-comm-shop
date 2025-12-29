@@ -43,11 +43,11 @@ export default function Register() {
   }
   return (
     <main className="flex flex-1 w-full flex-col items-center justify-center">
-      <div className="flex flex-col bg-bg-secondary items-center gap-6 text-center rounded-sm p-16 m-10">
+      <div className="flex flex-col bg-bg-secondary items-center gap-6 text-center rounded-sm p-8 sm:p-16 m-10">
         <h2 className="text-3xl p-2">Zarejestruj Nowe Konto</h2>
         <form
           onSubmit={isSubmitSuccessful ? null : handleSubmit(onSubmit)}
-          className="flex flex-col gap-2"
+          className="flex flex-col justify-center items-center gap-2"
         >
           <TextField
             id="email"
@@ -63,7 +63,7 @@ export default function Register() {
             helperText={errors.email?.message}
             variant="outlined"
             type="text"
-            className="w-104"
+            className="w-70 sm:w-104"
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
@@ -90,7 +90,7 @@ export default function Register() {
             })}
             variant="outlined"
             type="password"
-            className="w-104"
+            className="w-70 sm:w-104"
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
@@ -114,7 +114,7 @@ export default function Register() {
             helperText={errors.passwordConfirm?.message}
             variant="outlined"
             type="password"
-            className="w-104"
+            className="w-70 sm:w-104"
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
@@ -137,7 +137,7 @@ export default function Register() {
             helperText={errors.name?.message}
             variant="outlined"
             type="text"
-            className="w-104"
+            className="w-70 sm:w-104"
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
@@ -163,7 +163,7 @@ export default function Register() {
             helperText={errors.phone?.message}
             variant="outlined"
             type="text"
-            className="w-104"
+            className="w-70 sm:w-104"
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
@@ -174,7 +174,7 @@ export default function Register() {
               "& .MuiInputLabel-root": { color: "rgb(148 163 184)" },
             }}
           />
-          <FormControl fullWidth>
+          <FormControl>
             <InputLabel
               id="demo-simple-select-error-label"
               sx={{ color: "rgb(148 163 184)" }}
@@ -189,6 +189,7 @@ export default function Register() {
               render={({ field }) => (
                 <Select
                   {...field}
+                  className="w-70 sm:w-104"
                   MenuProps={{
                     PaperProps: {
                       sx: {
@@ -249,7 +250,7 @@ export default function Register() {
               </FormHelperText>
             ) : null}
           </FormControl>
-          <div className="flex flex-row gap-4 w-fit">
+          <div className="flex flex-col sm:flex-row gap-4 w-fit">
             <TextField
               id="post-code"
               label="Kod Pocztowy"
@@ -265,7 +266,7 @@ export default function Register() {
               helperText={errors.postcode?.message}
               variant="outlined"
               type="text"
-              className="w-40"
+              className="w-70 sm:w-40"
               sx={{
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "rgb(148 163 184)" },
@@ -287,7 +288,7 @@ export default function Register() {
               helperText={errors.city?.message}
               variant="outlined"
               type="text"
-              className="w-60"
+              className="w-70 sm:w-60"
               sx={{
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "rgb(148 163 184)" },
@@ -310,7 +311,7 @@ export default function Register() {
             helperText={errors.adress?.message}
             variant="outlined"
             type="text"
-            className="w-104"
+            className="w-70 sm:w-104"
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
@@ -336,18 +337,18 @@ export default function Register() {
               Oświadczam, że znam i akceptuję postanowienia Regulaminu
             </label>
           </div>
-          <div className="flex flex-row justify-center items-center gap-3 p-3">
-            <Link href={"/login"}>
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 p-3 w-full">
+            <Link href={"/login"} className="w-full sm:w-1/2">
               <button
                 type="button"
-                className="border border-gray-500 px-6 py-3 rounded-sm"
+                className="w-full border border-gray-500 p-3 rounded-sm"
               >
                 Zaloguj się
               </button>
             </Link>
             <button
               type="submit"
-              className="bg-primary text-text_secondary px-6 py-3 rounded-sm hover:bg-hover"
+              className="w-full sm:w-1/2 bg-primary text-text-secondary p-3 rounded-sm cursor-pointer hover:bg-primary-hover"
             >
               {isSubmitSuccessful
                 ? "Zarejestrowano"

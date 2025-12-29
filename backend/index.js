@@ -498,7 +498,7 @@ app.post("/api/make_order", requireAuth, async (req, res) => {
 app.get("/api/my_orders", requireAuth, async (req, res) => {
   try {
     const [orders] = await promisePool.query(
-      "SELECT o.id, o.total_amount, o.status, o.created_at FROM orders o WHERE user_id = ?",
+      "SELECT o.id, o.total_amount, o.status, o.created_at FROM orders o WHERE user_id = ? ORDER BY o.created_at DESC",
       [req.session.userId]
     );
     if (!orders.length) return res.json({ orders: [] });

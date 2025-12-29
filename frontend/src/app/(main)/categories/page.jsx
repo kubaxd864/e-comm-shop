@@ -69,14 +69,16 @@ export default function Category() {
           w kategorii {currentCategory}
         </h3>
       ) : null}
-      <div className="flex flex-row gap-5 w-full">
+      <div className="flex flex-col md:flex-row gap-5 w-full">
         <FilterSideBar categories={categories} stores={stores} />
         {!data && isValidating ? (
-          <p className="w-3/4 text-center">Wczytywanie produktów...</p>
+          <p className="w-full md:w-3/4 text-center">
+            Wczytywanie produktów...
+          </p>
         ) : error ? (
-          <p className="w-3/4 text-center">Błąd pobieranie danych</p>
+          <p className="w-full md:w-3/4 text-center">Błąd pobieranie danych</p>
         ) : products.length == 0 ? (
-          <div className="flex flex-col gap-2 w-3/4">
+          <div className="flex flex-col gap-2 w-full md:w-3/4">
             <p className="w-full text-2xl text-center">
               Niestety nie znaleźliśmy pasujących produktów
             </p>
@@ -86,7 +88,7 @@ export default function Category() {
           </div>
         ) : (
           <div
-            className="w-3/4 px-5 grid gap-15 mx-auto h-fit"
+            className="w-full md:w-3/4 md:px-10 grid gap-15 mx-auto h-fit"
             style={{
               gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
             }}

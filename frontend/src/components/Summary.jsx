@@ -6,7 +6,7 @@ export default function Summary({ step, setStep }) {
   const { itemsSum, deliverySum } = useCart();
   const router = useRouter();
   return (
-    <div className="flex flex-col h-fit w-1/4 min-w-72 gap-2 bg-bg-secondary rounded-sm p-4">
+    <div className="flex flex-col h-fit w-full lg:w-1/4 min-w-72 gap-2 bg-bg-secondary rounded-sm p-4">
       <h1 className="text-xl text-center pb-6">Podsumowanie Zamówienia</h1>
       <div className="flex flex-row w-full justify-between">
         <p>Wartość produktów:</p>

@@ -53,9 +53,9 @@ export default function UserData({ modified }) {
   }, [invoice, unregister]);
 
   return (
-    <div className="flex flex-col gap-3 p-8 bg-bg-secondary rounded-sm w-3/4">
-      <div className="flex flex-row gap-5">
-        <div className="flex flex-col w-1/2 gap-1">
+    <div className="flex flex-col gap-3 p-8 bg-bg-secondary rounded-sm w-full lg:wadw-3/4">
+      <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col w-full md:w-1/2 gap-1">
           <input
             {...register("name", {
               required: "To pole jest wymagane",
@@ -72,7 +72,7 @@ export default function UserData({ modified }) {
             {formState.errors.name?.message}
           </label>
         </div>
-        <div className="flex flex-col w-1/2 gap-1">
+        <div className="flex flex-col w-full md:w-1/2 gap-1">
           <input
             {...register("surname", {
               required: "To pole jest wymagane",
@@ -107,8 +107,8 @@ export default function UserData({ modified }) {
           {formState.errors.address?.message}
         </label>
       </div>
-      <div className="flex flex-row gap-5">
-        <div className="flex flex-col gap-1 w-1/4">
+      <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col gap-1 w-full md:w-1/4">
           <input
             {...register("postcode", {
               required: "To pole jest wymagane",
@@ -129,7 +129,7 @@ export default function UserData({ modified }) {
             {formState.errors.postcode?.message}
           </label>
         </div>
-        <div className="flex flex-col gap-1 w-3/4">
+        <div className="flex flex-col gap-1 w-full md:w-3/4">
           <input
             {...register("city", {
               required: "To pole jest wymagane",
@@ -147,8 +147,8 @@ export default function UserData({ modified }) {
           </label>
         </div>
       </div>
-      <div className="flex flex-row gap-5">
-        <div className="flex flex-col gap-1 w-1/2">
+      <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col gap-1 w-full md:w-1/2">
           <input
             {...register("email", {
               required: "To pole jest wymagane",
@@ -168,7 +168,7 @@ export default function UserData({ modified }) {
             {formState.errors.email?.message}
           </label>
         </div>
-        <div className="flex flex-col gap-1 w-1/2">
+        <div className="flex flex-col gap-1 w-full md:w-1/2">
           <input
             {...register("phone", {
               required: "To pole jest wymagane",
@@ -218,8 +218,8 @@ export default function UserData({ modified }) {
       {invoice ? (
         <div className="flex flex-col gap-5 pt-5">
           <h2 className="text-xl">Dane do Faktury</h2>
-          <div className="flex flex-row gap-5">
-            <div className="flex flex-col gap-1 w-3/4">
+          <div className="flex flex-col md:flex-row gap-5">
+            <div className="flex flex-col gap-1 w-full md:w-3/4">
               <input
                 {...register("company_name", {
                   required: "To pole jest wymagane",
@@ -236,7 +236,7 @@ export default function UserData({ modified }) {
                 {formState.errors.company_name?.message}
               </label>
             </div>
-            <div className="flex flex-col gap-1 w-1/4">
+            <div className="flex flex-col gap-1 w-full md:w-1/4">
               <input
                 {...register("nip_number", {
                   required: "To pole jest wymagane",
@@ -295,8 +295,8 @@ export default function UserData({ modified }) {
               {formState.errors.country?.message}
             </label>
           </div>
-          <div className="flex flex-row gap-5">
-            <div className="flex flex-col gap-1 w-1/4">
+          <div className="flex flex-col md:flex-row gap-5">
+            <div className="flex flex-col gap-1 w-full md:w-1/4">
               <input
                 {...register("company_postcode", {
                   required: "To pole jest wymagane",

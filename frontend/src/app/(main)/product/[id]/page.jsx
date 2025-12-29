@@ -30,14 +30,14 @@ export default function ProductPage() {
   return (
     <main className="flex flex-1 w-full flex-col justify-center items-center gap-9">
       <div className="flex flex-col w-10/12 bg-bg-secondary p-4 m-16 rounded-lg gap-3">
-        <div className="flex flex-row gap-3 px-2">
+        <div className="flex flex-row flex-wrap text-sm sm:text-base gap-3 px-2">
           <Link href={"/"}>Strona główna</Link> /
           <Link href={`/categories/${product?.category_slug}`}>
             {product.category_name}
           </Link>
           /<p>{product.name}</p>
         </div>
-        <div className="flex flex-col justify-center items-center lg:flex-row lg:items-start gap-8 p-2">
+        <div className="flex flex-col justify-center items-center xl:flex-row xl:items-start gap-8 p-2">
           <div className="flex max-w-[600px]">
             <ImageGalleryClient items={galleryItems} />
           </div>

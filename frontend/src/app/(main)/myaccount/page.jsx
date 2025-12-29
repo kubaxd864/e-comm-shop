@@ -132,7 +132,7 @@ export default function Myaccount() {
                 icon={faPenToSquare}
                 className="p-0.75"
               ></FontAwesomeIcon>
-              Edytuj
+              <span className="hidden sm:flex">Edytuj</span>
             </button>
           ) : null}
         </div>

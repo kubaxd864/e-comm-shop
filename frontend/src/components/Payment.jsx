@@ -9,7 +9,7 @@ import { useIsDark } from "@/hooks/useIsDark";
 
 export default function PaymentStep({ setStep }) {
   const { itemsSum, deliverySum } = useCart();
-  const { isDark } = useIsDark();
+  const isDark = useIsDark();
   const [stripePromise, setStripePromise] = useState(null);
   const [clientSecret, setClientSecret] = useState(null);
   const initialized = useRef(false);

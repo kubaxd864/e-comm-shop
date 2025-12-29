@@ -44,7 +44,7 @@ export default function Contact() {
   return (
     <main className="flex flex-1 flex-col w-full items-center p-10 ">
       <h1 className="text-3xl font-bold text-center mb-8">Kontakt do Nas</h1>
-      <div className="flex flex-col w-8/12 bg-bg-secondary p-8 rounded-lg gap-3">
+      <div className="flex flex-col w-full md:w-10/12 lg:w-8/12 bg-bg-secondary p-8 rounded-lg gap-3">
         <p>
           Jeśli masz pytania dotyczące zamówień, produktów lub działania serwisu
           – skontaktuj się z nami.
@@ -115,7 +115,7 @@ export default function Contact() {
                 >
                   <option
                     value=""
-                    className="bg-bg_secondary text-text_primary"
+                    className="bg-bg-secondary text-text-primary"
                   >
                     Wybierz placówkę do Kontaktu
                   </option>
@@ -123,7 +123,7 @@ export default function Contact() {
                     <option
                       key={p.id}
                       value={p.id}
-                      className="bg-bg_secondary text-text_primary"
+                      className="bg-bg-secondary text-text-primary"
                     >
                       {p.name}
                     </option>

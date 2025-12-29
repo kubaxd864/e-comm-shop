@@ -14,7 +14,7 @@ export default function Myorders() {
   const orders = useMemo(() => data?.orders ?? [], [data]);
   return (
     <main className="flex flex-1 w-full justify-center p-10">
-      <div className="w-6/12">
+      <div className="w-full md:w-10/12 lg:w-8/12 xl:w-6/12">
         <h1 className="text-3xl font-bold text-center mb-8">
           Twoje zamówienia
         </h1>
@@ -41,33 +41,31 @@ export default function Myorders() {
                     <span className="font-bold capitalize">{o.status}</span>
                   </p>
                 </div>
-                <div className="flex flex-col gap-3">
-                  {o?.items?.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="relative flex items-center gap-3 w-full"
-                    >
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={item.thumbnail}
-                          alt={item.product_name}
-                          className="w-24 h-16 object-contain rounded-md bg-white p-1"
-                        />
-                        <Link href={`/product/${item.product_id}`}>
-                          <p>{item.product_name}</p>
-                        </Link>
-                      </div>
-                      <div className="ml-auto">
-                        <p>
-                          {item.quantity} x {item.price} zł
-                        </p>
-                      </div>
-                      <div className="ml-auto">
-                        <p className="font-bold">{item.price} zł</p>
-                      </div>
+                {o?.items?.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="flex flex-col sm:flex-row items-center gap-3 w-full"
+                  >
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <img
+                        src={item.thumbnail}
+                        alt={item.product_name}
+                        className="w-24 h-16 object-contain rounded-md bg-white p-1"
+                      />
+                      <Link href={`/product/${item.product_id}`}>
+                        <p>{item.product_name}</p>
+                      </Link>
                     </div>
-                  ))}
-                </div>
+                    <div className="ml-0 sm:ml-auto">
+                      <p>
+                        {item.quantity} x {item.price} zł
+                      </p>
+                    </div>
+                    <div className="ml-0 sm:ml-auto">
+                      <p className="font-bold">{item.price} zł</p>
+                    </div>
+                  </div>
+                ))}
                 <div className="flex flex-row justify-between border-t border-border pt-3">
                   <p className="">Razem z dostawą:</p>
                   <p className="font-bold">{o.total_amount} zł</p>

@@ -23,12 +23,12 @@ export default function Basket() {
         ) : items?.length === 0 ? (
           <p>Koszyk jest pusty</p>
         ) : (
-          <div className="flex flex-row gap-4 w-full justify-center">
-            <div className="flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row gap-4 w-full justify-center items-center md:items-baseline">
+            <div className="flex flex-col gap-4 w-full">
               {groupedByStore.map((el, idx) => (
                 <div
                   key={idx}
-                  className="flex flex-col gap-1 p-4 bg-bg-secondary"
+                  className="flex flex-col gap-1 p-4 bg-bg-secondary rounded"
                 >
                   <p className="">Przesyłka od {el.store_name}</p>
                   {el.items.map((el, idx) => (
@@ -47,7 +47,7 @@ export default function Basket() {
                 </div>
               ))}
             </div>
-            <div className="flex flex-col h-fit w-[25%] min-w-72 gap-2 bg-bg-secondary rounded-sm p-4">
+            <div className="flex flex-col h-fit w-full md:w-[25%] min-w-72 gap-2 bg-bg-secondary rounded-sm p-4">
               <div className="flex flex-row w-full justify-between">
                 <p>Wartość produktów:</p>
                 <p>{itemsSum.toFixed(2)} zł</p>

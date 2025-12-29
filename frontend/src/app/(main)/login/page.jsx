@@ -40,7 +40,7 @@ export default function Login() {
   }
   return (
     <main className="flex flex-1 w-full flex-col items-center justify-center">
-      <div className="flex flex-col bg-bg-secondary items-center gap-6 text-center rounded-sm p-16 m-10">
+      <div className="flex flex-col bg-bg-secondary items-center gap-6 text-center rounded-sm p-10 sm:p-16 m-10">
         <h2 className="text-3xl p-2">Zaloguj Się do Konta</h2>
         <form
           onSubmit={isSubmitSuccessful ? null : handleSubmit(onSubmit)}
@@ -60,7 +60,7 @@ export default function Login() {
             })}
             variant="outlined"
             type="text"
-            className="w-80"
+            className="w-60 sm:w-80"
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
@@ -82,7 +82,7 @@ export default function Login() {
             })}
             variant="outlined"
             type="password"
-            className="w-80"
+            className="w-60 sm:w-80"
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": { borderColor: "rgb(148 163 184)" },
@@ -107,18 +107,18 @@ export default function Login() {
           <p className="flex text-blue-500 pb-2 hover:underline">
             <Link href={"/password_reset"}>Zapomniałeś Hasła?</Link>
           </p>
-          <div className="flex flex-row justify-center items-center gap-3 p-3">
-            <Link href={"/register"}>
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 p-3 w-full">
+            <Link href={"/register"} className="w-full sm:w-1/2">
               <button
                 type="button"
-                className="border border-gray-500 px-6 py-3 rounded-sm"
+                className="w-full border border-gray-500 p-3 rounded-sm"
               >
                 Zarejestruj Się
               </button>
             </Link>
             <button
               type="submit"
-              className="bg-primary text-text-secondary px-6 py-3 rounded-sm cursor-pointer hover:bg-primary-hover"
+              className="w-full sm:w-1/2 bg-primary text-text-secondary p-3 rounded-sm cursor-pointer hover:bg-primary-hover"
             >
               {isSubmitting ? "Logowanie.. " : "Zaloguj Się"}
             </button>

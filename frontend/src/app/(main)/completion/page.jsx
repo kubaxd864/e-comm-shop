@@ -5,7 +5,7 @@ export default function Completion() {
   const router = useRouter();
   return (
     <main className="flex flex-1 w-full justify-center items-center">
-      <div className="flex flex-col gap-5 bg-bg-secondary p-10 rounded-sm">
+      <div className="flex flex-col gap-5 bg-bg-secondary p-10 m-10 text-center sm:text-left rounded-sm">
         <h1 className="text-3xl font-bold">Dziękujemy za zakupy!</h1>
         <p className="text-lg">
           Twoje zamówienie zostało przyjęte i wkrótce zostanie przygotowane do

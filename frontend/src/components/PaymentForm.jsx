@@ -19,14 +19,11 @@ export default function PaymentForm({ setStep }) {
 
   const handlePay = async () => {
     if (!stripe || !elements) return;
-
     setIsProcessing(true);
-
     const { error } = await stripe.confirmPayment({
       elements,
       redirect: "if_required",
     });
-
     if (error) {
       setErrorMessage(error.message);
       setIsProcessing(false);
@@ -44,20 +41,20 @@ export default function PaymentForm({ setStep }) {
       return;
     } finally {
       setIsProcessing(false);
+      router.push("/completion");
     }
-    router.push("/completion");
   };
 
   return (
-    <div className="flex flex-row w-full gap-5">
+    <div className="flex flex-col lg:flex-row w-full gap-5">
       <PaymentElement
         options={{
           layout: { type: "tabs" },
           defaultValues: { paymentMethod: { type: "card" } },
         }}
-        className="w-3/4 bg-bg_secondary rounded-sm p-5"
+        className="w-full lg:w-3/4 bg-bg_secondary rounded-sm p-5"
       />
-      <div className="flex flex-col h-fit w-1/4 min-w-72 gap-2 bg-bg-secondary rounded-sm p-4">
+      <div className="flex flex-col h-fit w-full lg:w-1/4 min-w-72 gap-2 bg-bg-secondary rounded-sm p-4">
         <h1 className="text-xl text-center pb-6">Podsumowanie Zamówienia</h1>
         <div className="flex flex-row w-full justify-between">
           <p>Wartość produktów:</p>

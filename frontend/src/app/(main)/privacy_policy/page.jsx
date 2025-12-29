@@ -4,7 +4,7 @@ export default function Privacy() {
       <h1 className="text-3xl font-bold text-center mb-8">
         Polityka Prywatności
       </h1>
-      <div className="flex flex-col w-8/12 bg-bg-secondary p-8 rounded-lg gap-3">
+      <div className="flex flex-col w-full md:w-10/12 lg:w-8/12 bg-bg-secondary p-8 rounded-lg gap-3">
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-2">1. Informacje ogólne</h2>
           <p>
