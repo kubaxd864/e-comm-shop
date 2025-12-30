@@ -21,8 +21,10 @@ export default function Favorites() {
               <ProductBox
                 key={idx}
                 id={f.id}
+                category_id={f.category_id}
                 name={f.name}
                 price={f.price}
+                promotion_price={f.promotion_price}
                 thumbnail={f.thumbnail}
                 condition={f.item_condition}
                 address={f.store_address}

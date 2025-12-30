@@ -225,12 +225,40 @@ app.put("/api/user_update", requireAuth, async (req, res) => {
   }
 });
 
+app.put("/api/change_password", requireAuth, async (req, res) => {
+  try {
+    const { oldpassword, newpassword } = req.body;
+    const [rows] = await promisePool.query(
+      "SELECT password_hash FROM users WHERE id = ?",
+      [req.session.userId]
+    );
+    const ok = await bcrypt.compare(oldpassword, rows[0].password_hash);
+    if (!ok) {
+      return res.status(400).json({ message: "Niepoprawne aktualne hasło" });
+    }
+    if (oldpassword === newpassword) {
+      return res
+        .status(400)
+        .json({ message: "Nowe hasło nie może być takie samo jak stare" });
+    }
+    const newHash = await bcrypt.hash(newpassword, bcryptRounds);
+    await promisePool.query("UPDATE users SET password_hash = ? WHERE id = ?", [
+      newHash,
+      req.session.userId,
+    ]);
+    return res.json({ message: "Zmieniono hasło" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Błąd podczas pobierania danych" });
+  }
+});
+
 app.get("/api/get_products", async (req, res) => {
   const limit = req.query.limit;
   const offset = req.query.offset;
   try {
     const [rows] = await promisePool.query(
-      `SELECT p.id, p.name, p.price, p.item_condition,
+      `SELECT p.id, p.name, p.category_id, p.price, p.promotion_price, p.item_condition,
        img.file_path AS thumbnail,
        s.address AS store_address, s.city AS store_city
         FROM products p
@@ -255,7 +283,7 @@ app.get("/api/get_product/data/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await promisePool.query(
-      `SELECT p.name, p.description, p.item_condition, p.price, p.quantity, p.size, p.created_at, p.is_active, 
+      `SELECT p.name, p.description, p.item_condition, p.price, p.promotion_price, p.quantity, p.size, p.created_at, p.is_active, 
       c.id AS category_id, c.name AS category_name, c.slug AS category_slug, c.is_active AS category_active, s.id AS shop_id,
       s.name AS shop_name, s.email AS shop_email, s.phone AS shop_phone, s.address AS shop_address, s.city AS shop_city,
       GROUP_CONCAT(img.file_path SEPARATOR '||') AS images, MAX(CASE WHEN img.is_main = 1 THEN img.file_path END) AS thumbnail
@@ -296,7 +324,7 @@ app.get("/api/get_simular_products", async (req, res) => {
 app.get("/api/favorites", requireAuth, async (req, res) => {
   try {
     const [rows] = await promisePool.query(
-      `SELECT p.id, p.name, p.price, p.item_condition, img.file_path thumbnail, s.address AS store_address, s.city AS store_city
+      `SELECT p.id, p.category_id, p.name, p.price, p.promotion_price, p.item_condition, img.file_path thumbnail, s.address AS store_address, s.city AS store_city
      FROM favorites f
      JOIN products p ON p.id = f.product_id
      LEFT JOIN product_images img
@@ -640,6 +668,7 @@ app.post(
         shop,
         condition,
         price,
+        promotion_price,
         imageIsMain,
       } = req.body;
       const [weight, width, height, length] = size.split("/").map(Number);
@@ -649,8 +678,14 @@ app.post(
         height: height,
         length: length,
       };
+      const promoPrice =
+        promotion_price === undefined ||
+        promotion_price === null ||
+        promotion_price === ""
+          ? null
+          : Number(promotion_price);
       const [product] = await promisePool.query(
-        "INSERT INTO products (name, category_id, description, quantity, size, store_id, item_condition, price, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO products (name, category_id, description, quantity, size, store_id, item_condition, price, promotion_price, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
           product_name,
           category,
@@ -660,6 +695,7 @@ app.post(
           shop,
           condition,
           price,
+          promoPrice,
           req.session.userId,
         ]
       );
@@ -677,10 +713,12 @@ app.post(
         imageIsMain[idx],
         `Zdjęcie Produktu`,
       ]);
-      await promisePool.query(
-        "INSERT INTO product_images (product_id, file_path, is_main, alt_text) VALUES ?",
-        [imagesToInsert]
-      );
+      if (imagesToInsert.length > 0) {
+        await promisePool.query(
+          "INSERT INTO product_images (product_id, file_path, is_main, alt_text) VALUES ?",
+          [imagesToInsert]
+        );
+      }
       res.status(200).json({ message: "Dodano" });
     } catch (err) {
       console.error(err);
@@ -730,6 +768,7 @@ app.put(
         shop,
         condition,
         price,
+        promotion_price,
         imageIsMain,
         existingImages,
         existingImageIsMain,
@@ -741,9 +780,30 @@ app.put(
         height: height,
         length: length,
       };
+      const promoPrice =
+        promotion_price === undefined ||
+        promotion_price === null ||
+        promotion_price === ""
+          ? null
+          : Number(promotion_price);
+      const normalizedExistingImages = Array.isArray(existingImages)
+        ? existingImages
+        : existingImages
+        ? [existingImages]
+        : [];
+      const normalizedExistingImageIsMain = Array.isArray(existingImageIsMain)
+        ? existingImageIsMain
+        : existingImageIsMain
+        ? [existingImageIsMain]
+        : [];
+      const normalizedImageIsMain = Array.isArray(imageIsMain)
+        ? imageIsMain
+        : imageIsMain
+        ? [imageIsMain]
+        : [];
       await promisePool.query(
         `UPDATE products
-        SET name = ?, category_id = ?, description = ?, quantity = ?, size = ?, store_id = ?, item_condition = ?, price = ?
+        SET name = ?, category_id = ?, description = ?, quantity = ?, size = ?, store_id = ?, item_condition = ?, price = ?, promotion_price = ?
         WHERE id = ?`,
         [
           product_name,
@@ -754,6 +814,7 @@ app.put(
           shop,
           condition,
           price,
+          promoPrice,
           id,
         ]
       );
@@ -762,12 +823,18 @@ app.put(
         [id]
       );
       const imagesToDelete = dbImages.filter(
-        (img) => !existingImages.includes(img.file_path)
+        (img) => !normalizedExistingImages.includes(img.file_path)
       );
-      for (let i = 0; i < existingImages.length; i++) {
+      for (let i = 0; i < normalizedExistingImages.length; i++) {
         await promisePool.query(
           "UPDATE product_images SET is_main = ? WHERE file_path = ? AND product_id = ?",
-          [existingImageIsMain[i], existingImages[i], id]
+          [
+            normalizedExistingImageIsMain[i] ??
+              normalizedExistingImageIsMain[0] ??
+              0,
+            normalizedExistingImages[i],
+            id,
+          ]
         );
       }
       for (const img of imagesToDelete) {
@@ -786,7 +853,7 @@ app.put(
         const imagesToInsert = uploadedImages.map((item, idx) => [
           id,
           item.url,
-          imageIsMain[idx],
+          normalizedImageIsMain[idx] ?? normalizedImageIsMain[0] ?? 0,
           `Zdjęcie Produktu`,
         ]);
         await promisePool.query(

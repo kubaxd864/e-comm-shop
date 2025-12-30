@@ -7,8 +7,10 @@ import CartBtn from "./AddCartButton";
 
 export default function ProductBox({
   id,
+  category_id,
   condition,
   name,
+  promotion_price,
   price,
   thumbnail,
   address,
@@ -52,7 +54,16 @@ export default function ProductBox({
           <p className="text-sm font-bold">{condition}</p>
         </div>
         <div className="mt-auto flex flex-col gap-2">
-          <p className="text-2xl text-right">{price} zł</p>
+          {category_id == "16" && promotion_price != null ? (
+            <p className="flex flex-col">
+              <span className="text-lg text-right text-gray-500 line-through">
+                {price} zł
+              </span>
+              <span className="text-2xl text-right">{promotion_price} zł</span>
+            </p>
+          ) : (
+            <p className="text-2xl text-right">{price} zł</p>
+          )}
           <div className="flex flex-row justify-between">
             <FavoriteBtn productId={id} />
             <CartBtn productId={id} />

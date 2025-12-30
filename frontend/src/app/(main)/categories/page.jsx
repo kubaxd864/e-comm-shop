@@ -97,9 +97,11 @@ export default function Category() {
               <ProductBox
                 key={product.id}
                 id={product.id}
+                category_id={product.category_id}
                 condition={product.item_condition}
                 name={product.name}
                 price={product.price}
+                promotion_price={product.promotion_price}
                 thumbnail={product.thumbnail}
                 address={product.store_address}
                 city={product.store_city}

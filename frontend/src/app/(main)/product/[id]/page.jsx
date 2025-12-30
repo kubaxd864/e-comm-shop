@@ -52,7 +52,19 @@ export default function ProductPage() {
               <p className="text-sm text-gray-400">( REF: {id} )</p>
             </div>
             <div className="flex flex-col gap-2.5">
-              <p className="text-4xl">{product?.price} zł</p>
+              {product?.category_id == "16" &&
+              product?.promotion_price != null ? (
+                <p className="flex flex-col gap-1">
+                  <span className="text-xl text-gray-500 line-through">
+                    {product?.price} zł
+                  </span>
+                  <span className="text-4xl">
+                    {product?.promotion_price} zł
+                  </span>
+                </p>
+              ) : (
+                <p className="text-4xl">{product?.price} zł</p>
+              )}
               <p className="text-sm">Liczba sztuk: {product?.quantity}</p>
             </div>
             <div className="flex flex-row justify-between">

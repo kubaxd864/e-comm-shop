@@ -6,7 +6,9 @@ export default function ProductDetailsForm({ form, categories, shops }) {
   const {
     register,
     formState: { errors },
+    watch,
   } = form;
+  const selectedCategory = watch("category");
 
   return (
     <div className="flex flex-col gap-4 p-2">
@@ -163,6 +165,24 @@ export default function ProductDetailsForm({ form, categories, shops }) {
             <p className="text-sm text-red-400">{errors.price.message}</p>
           )}
         </div>
+        {selectedCategory == "16" ? (
+          <div className="flex flex-col gap-2 w-full md:w-1/2">
+            <label>Promocyjna Cena</label>
+            <input
+              type="number"
+              {...register("promotion_price", {
+                required: "Podaj cenę promocyjną",
+              })}
+              placeholder="Cena Promocyjna"
+              className="w-full border border-border px-2 py-3 rounded-sm"
+            />
+            {errors.promotion_price && (
+              <p className="text-sm text-red-400">
+                {errors.promotion_price.message}
+              </p>
+            )}
+          </div>
+        ) : null}
       </div>
     </div>
   );

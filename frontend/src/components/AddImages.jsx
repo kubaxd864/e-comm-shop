@@ -17,11 +17,11 @@ export default function ImageUploader({ images, setImages }) {
     const newImages = files
       .map((file) => {
         if (file.size > 5 * 1024 * 1024) {
-          alert(`Plik ${file.name} > 5 MB`);
+          addToast(`Plik ${file.name} > 5 MB`, "error");
           return null;
         }
         if (!validTypes.includes(file.type)) {
-          alert(`Niepoprawny format: ${file.name}`);
+          addToast(`Niepoprawny format: ${file.name}`, "error");
           return null;
         }
 

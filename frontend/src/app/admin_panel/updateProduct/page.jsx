@@ -63,6 +63,7 @@ export default function UpdateProduct() {
       quantity: productData.quantity,
       shop: productData.shop_id,
       price: productData.price,
+      promotion_price: productData.promotion_price,
       description: productData.description,
     });
   }, [productData, parsedSize, form]);

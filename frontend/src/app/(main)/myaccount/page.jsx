@@ -4,6 +4,7 @@ import { useToast } from "@/components/ToastProvider";
 import { useForm } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
+import PasswordForm from "@/components/PasswordForm";
 import { useState } from "react";
 import axios from "axios";
 
@@ -89,7 +90,7 @@ export default function Myaccount() {
     <main className="flex flex-1 w-full flex-col items-center justify-center gap-4 px-6 py-16">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col w-full max-w-[700px] gap-8 bg-bg-secondary rounded-sm p-6 m-10"
+        className="flex flex-col w-full max-w-[700px] gap-8 bg-bg-secondary rounded-sm p-6 m-10 mb-0"
       >
         <div className="flex flex-row justify-between">
           <div className="flex flex-col gap-5 p-4">
@@ -154,6 +155,7 @@ export default function Myaccount() {
           </div>
         ) : null}
       </form>
+      <PasswordForm />
     </main>
   );
 }

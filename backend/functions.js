@@ -226,6 +226,7 @@ async function fetchProducts(query) {
         p.store_id,
         p.item_condition,
         p.price,
+        p.promotion_price,
         img.file_path AS thumbnail,
         s.address AS store_address,
         s.city AS store_city

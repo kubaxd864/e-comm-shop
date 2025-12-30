@@ -42,6 +42,7 @@ export default function Header() {
   function searchByName() {
     const name = nameInput.current?.value?.trim();
     if (!name) return;
+    if (nameInput.current) nameInput.current.value = "";
     router.push(`/categories?name=${name}`);
   }
 
@@ -126,10 +127,21 @@ export default function Header() {
         </div>
         <div className="relative flex md:hidden">
           <button
-            onClick={() => setMobileMenuOpen((prev) => !prev)}
-            className="flex items-center justify-center text-xl"
+            onClick={() => {
+              user ? setMobileMenuOpen((prev) => !prev) : router.push("/login");
+            }}
+            className={`flex flex-col gap-2 items-center justify-center cursor-pointer ${
+              user ? "text-xl" : "text-sm"
+            }`}
           >
-            <FontAwesomeIcon icon={faBars} />
+            <FontAwesomeIcon icon={user ? faBars : faUser} />
+            <span
+              className={`text-sm whitespace-nowrap ${
+                user ? "hidden" : "flex"
+              }`}
+            >
+              Zaloguj się
+            </span>
           </button>
           <div
             className={`absolute right-0 top-full z-1000 mt-2 flex min-w-[200px] flex-col gap-5 rounded-sm border border-border bg-bg-primary p-3 text-left text-sm transition-all duration-200 ease-out origin-top transform ${
@@ -188,19 +200,7 @@ export default function Header() {
                   Wyloguj się
                 </button>
               </>
-            ) : (
-              <>
-                <Link href={"/login"} onClick={() => setMobileMenuOpen(false)}>
-                  <p>Zaloguj się</p>
-                </Link>
-                <Link
-                  href={"/register"}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <p>Zarejestruj się</p>
-                </Link>
-              </>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

@@ -60,8 +60,10 @@ export default function Home() {
             <ProductBox
               key={product.id}
               id={product.id}
+              category_id={product.category_id}
               condition={product.item_condition}
               name={product.name}
+              promotion_price={product.promotion_price}
               price={product.price}
               thumbnail={product.thumbnail}
               address={product.store_address}
