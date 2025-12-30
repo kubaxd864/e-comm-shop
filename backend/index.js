@@ -283,7 +283,7 @@ app.get("/api/get_product/data/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await promisePool.query(
-      `SELECT p.name, p.description, p.item_condition, p.price, p.promotion_price, p.quantity, p.size, p.created_at, p.is_active, 
+      `SELECT p.name, p.description, p.item_condition, p.price, p.promotion_price, p.quantity, p.parameters, p.size, p.created_at, p.is_active, 
       c.id AS category_id, c.name AS category_name, c.slug AS category_slug, c.is_active AS category_active, s.id AS shop_id,
       s.name AS shop_name, s.email AS shop_email, s.phone AS shop_phone, s.address AS shop_address, s.city AS shop_city,
       GROUP_CONCAT(img.file_path SEPARATOR '||') AS images, MAX(CASE WHEN img.is_main = 1 THEN img.file_path END) AS thumbnail

@@ -19,7 +19,7 @@ export default function CartItem({ id, name, price, quantity, thumbnail }) {
           {name}
         </p>
       </Link>
-      <div className="flex flex-col md:flex-row gap-8 items-center">
+      <div className="flex flex-col md:flex-row gap-8 items-center ml-0 lg:ml-auto">
         <QuantityNumber value={quantity} productId={id} />
         <div className="flex flex-row gap-8 items-center">
           <p className="text-xl font-bold">{price} zł</p>

@@ -24,7 +24,7 @@ export default function Basket() {
           <p>Koszyk jest pusty</p>
         ) : (
           <div className="flex flex-col md:flex-row gap-4 w-full justify-center items-center md:items-baseline">
-            <div className="flex flex-col gap-4 w-full">
+            <div className="flex flex-col gap-4 w-full max-w-4xl">
               {groupedByStore.map((el, idx) => (
                 <div
                   key={idx}

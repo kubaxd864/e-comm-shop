@@ -6,6 +6,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBoxOpen } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 
+const statusStyles = {
+  opłacone: "bg-orange-400/10 text-orange-500",
+  potwierdzone: "bg-yellow-500/10 text-yellow-500",
+  wysłane: "bg-green-500/10 text-green-500",
+  anulowane: "bg-red-500/10 text-red-600",
+};
+
 export default function Myorders() {
   const { data, error, isLoading } = useSWR(
     "http://localhost:5000/api/my_orders",
@@ -34,12 +41,15 @@ export default function Myorders() {
                 <div className="flex flex-row justify-between border-b border-border pb-3">
                   <p className="flex flex-row gap-2 justify-center items-center">
                     <FontAwesomeIcon icon={faBoxOpen}></FontAwesomeIcon>
-                    Zamówienie #{idx}{" "}
+                    Zamówienie #{o.id}{" "}
                   </p>
-                  <p>
-                    Status:{" "}
-                    <span className="font-bold capitalize">{o.status}</span>
-                  </p>
+                  <span
+                    className={`px-3 py-1 rounded text-xs font-medium capitalize ${
+                      statusStyles[o.status]
+                    }`}
+                  >
+                    {o.status}
+                  </span>
                 </div>
                 {o?.items?.map((item, idx) => (
                   <div

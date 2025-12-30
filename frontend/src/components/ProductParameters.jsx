@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function ProductParameters({
   description,
+  parameters,
   shop_id,
   shop_address,
   shop_city,
@@ -14,7 +15,8 @@ export default function ProductParameters({
 }) {
   const [openedSection, setSection] = useState("Opis");
   const router = useRouter();
-
+  const parametry =
+    typeof parameters === "string" ? JSON.parse(parameters) : parameters ?? {};
   function SameStoreProducts(shopId) {
     if (!shopId) return;
     router.push(`/categories?shop=${shopId}`);
@@ -60,10 +62,11 @@ export default function ProductParameters({
         </div>
       ) : openedSection === "Parametry" ? (
         <div className="grid grid-flow-col grid-rows-4 gap-3">
-          <p>Producent: Samsung</p>
-          <p>Stan: Używane</p>
-          <p>Typ: Etui</p>
-          <p>Waga: 30.00g</p>
+          {Object.entries(parametry).map(([label, value]) => (
+            <p key={label}>
+              <span className="font-semibold capitalize">{label}:</span> {value}
+            </p>
+          ))}
           <p>
             Data Dodania:{" "}
             {created_at
