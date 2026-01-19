@@ -56,9 +56,9 @@ export default function Home() {
             gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
           }}
         >
-          {products.map((product) => (
+          {products.map((product, idx) => (
             <ProductBox
-              key={product.id}
+              key={idx}
               id={product.id}
               category_id={product.category_id}
               condition={product.item_condition}

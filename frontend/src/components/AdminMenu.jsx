@@ -16,6 +16,7 @@ import {
   faChartColumn,
   faBoxesStacked,
   faRightFromBracket,
+  faMessage,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function AdminMenu() {
@@ -30,6 +31,7 @@ export default function AdminMenu() {
     { link: "/admin_panel/orders", icon: faReceipt, title: "Zamówienia" },
     { link: "/admin_panel/clients", icon: faUsers, title: "Klienci" },
     { link: "/admin_panel/categories", icon: faTags, title: "Kategorie" },
+    { link: "/admin_panel/messages", icon: faMessage, title: "Wiadomości" },
     { link: "", icon: faGear, title: "Ustawienia" },
   ];
 

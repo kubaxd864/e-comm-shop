@@ -34,6 +34,17 @@ export default function UpdateProduct() {
       return "";
     }
   }, [productData?.size]);
+  const parsedParameters = useMemo(() => {
+    const raw = productData?.parameters;
+    if (!raw) return "";
+    const params = typeof raw === "string" ? JSON.parse(raw) : raw;
+    return Object.entries(params)
+      .map(
+        ([key, value]) =>
+          `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`
+      )
+      .join(", ");
+  }, [productData?.parameters]);
 
   useEffect(() => {
     if (!productData?.images) return;
@@ -60,6 +71,7 @@ export default function UpdateProduct() {
       category: productData.category_id,
       condition: productData.item_condition,
       size: parsedSize,
+      parameters: parsedParameters,
       quantity: productData.quantity,
       shop: productData.shop_id,
       price: productData.price,

@@ -184,6 +184,21 @@ export default function ProductDetailsForm({ form, categories, shops }) {
           </div>
         ) : null}
       </div>
+      <div className="flex flex-col gap-5">
+        <h2 className="text-xl font-semibold">Parametry Produktu</h2>
+        <textarea
+          rows={6}
+          placeholder="Parametry produktu np. Marka: Sony, Model:Vaio"
+          className="border border-border p-3 rounded-sm"
+          {...register("parameters", {
+            required: "Podaj parametry produktu",
+            minLength: { value: 10, message: "Podaj parametry Produktu" },
+          })}
+        />
+        {errors.parameters && (
+          <p className="text-sm text-red-400">{errors.parameters.message}</p>
+        )}
+      </div>
     </div>
   );
 }

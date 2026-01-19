@@ -11,8 +11,8 @@ cloudinary.config({
 
 async function getUserByEmail(email) {
   const [rows] = await promisePool.query(
-    "SELECT id, email, password_hash, is_active FROM users WHERE email = ?",
-    [email]
+    "SELECT id, email, password_hash, role, is_active FROM users WHERE email = ?",
+    [email],
   );
   return rows[0];
 }
@@ -20,12 +20,12 @@ async function getUserByEmail(email) {
 async function getOrCreateCart(userId) {
   const [rows] = await promisePool.query(
     "SELECT * FROM carts WHERE user_id = ?",
-    [userId]
+    [userId],
   );
   if (rows.length > 0) return rows[0];
   const [result] = await promisePool.query(
     "INSERT INTO carts (user_id) VALUES (?)",
-    [userId]
+    [userId],
   );
   const newCart = {
     id: result.insertId,
@@ -75,7 +75,7 @@ async function getPrices({ width, height, length, weight }) {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
     return res.data.couriers;
   } catch (err) {
@@ -292,7 +292,7 @@ async function fetchStores() {
 
 async function fetchOrders() {
   const [orders] = await promisePool.query(
-    "SELECT o.id, u.name, u.surname, o.total_amount, o.status, o.created_at FROM orders o LEFT JOIN users u ON u.id = o.user_id ORDER BY o.created_at DESC"
+    "SELECT o.id, u.name, u.surname, o.total_amount, o.status, o.created_at FROM orders o LEFT JOIN users u ON u.id = o.user_id ORDER BY o.created_at DESC",
   );
   return orders;
 }
@@ -300,7 +300,7 @@ async function fetchOrders() {
 async function fetchLatestProducts() {
   const [products] = await promisePool.query(
     `SELECT p.id, p.name, p.price, p.store_id, p.is_active, p.created_at, img.file_path AS thumbnail FROM products p 
-    LEFT JOIN product_images img ON img.product_id = p.id AND img.is_main ORDER BY p.created_at DESC`
+    LEFT JOIN product_images img ON img.product_id = p.id AND img.is_main ORDER BY p.created_at DESC`,
   );
   return products;
 }
@@ -337,7 +337,7 @@ function uploadToCloudinary(file, folder) {
           uploadId: result.public_id,
           url: result.secure_url,
         });
-      }
+      },
     );
     uploadStream.end(file.buffer);
   });
@@ -372,7 +372,7 @@ const requireAdmin = async (req, res, next) => {
     }
     const [rows] = await promisePool.query(
       "SELECT role FROM users WHERE id = ? AND is_active = 1",
-      [req.session.userId]
+      [req.session.userId],
     );
     const role = rows[0].role;
     if (role !== "admin" && role !== "owner") {
@@ -389,13 +389,60 @@ const requireAdmin = async (req, res, next) => {
 const requireOwner = async (req, res, next) => {
   const [rows] = await promisePool.query(
     "SELECT role FROM users WHERE id = ?",
-    [req.session.userId]
+    [req.session.userId],
   );
   if (rows[0]?.role !== "owner") {
     return res.json({ message: "Brak uprawnień do tej operacji" });
   }
   next();
 };
+
+async function getOrCreateChatRoom(order) {
+  const [rows] = await promisePool.query(
+    `SELECT * FROM chat_rooms WHERE order_id = ?`,
+    [order.id],
+  );
+
+  if (rows.length > 0) return rows[0];
+
+  const [result] = await promisePool.query(
+    `INSERT INTO chat_rooms (order_id, shop_id, client_id)
+     VALUES (?, ?, ?)`,
+    [order.id, order.shop_id, order.user_id],
+  );
+
+  return {
+    id: result.insertId,
+    order_id: order.id,
+    shop_id: order.shop_id,
+    client_id: order.user_id,
+  };
+}
+
+async function createMessage({ chatRoomId, senderId, senderRole, content }) {
+  const [result] = await promisePool.query(
+    `INSERT INTO chat_messages
+     (chat_room_id, sender_id, sender_role, content)
+     VALUES (?, ?, ?, ?)`,
+    [chatRoomId, senderId, senderRole, content],
+  );
+
+  await promisePool.query(
+    `UPDATE chat_rooms
+     SET last_message_at = NOW()
+     WHERE id = ?`,
+    [chatRoomId],
+  );
+
+  return {
+    id: result.insertId,
+    chatRoomId,
+    senderId,
+    senderRole,
+    content,
+    createdAt: new Date(),
+  };
+}
 
 module.exports = {
   getUserByEmail,
@@ -415,4 +462,6 @@ module.exports = {
   requireAuth,
   requireAdmin,
   requireOwner,
+  getOrCreateChatRoom,
+  createMessage,
 };

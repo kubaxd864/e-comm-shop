@@ -16,7 +16,7 @@ const statusStyles = {
 export default function Myorders() {
   const { data, error, isLoading } = useSWR(
     "http://localhost:5000/api/my_orders",
-    fetcher
+    fetcher,
   );
   const orders = useMemo(() => data?.orders ?? [], [data]);
   return (

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { useRouter } from "next/navigation";
+import MsgButton from "./MessageButton";
 
 export default function ProductParameters({
   description,
@@ -82,12 +83,15 @@ export default function ProductParameters({
           <p className="text-sm">Telefon: {shop_phone}</p>
           <p className="text-sm">Email: {shop_email}</p>
           <p className="text-sm">Godziny Otwarcia: 10-18</p>
-          <button
-            onClick={() => SameStoreProducts(shop_id)}
-            className="bg-primary text-text-secondary text-sm px-6 py-3 mt-1 rounded-sm cursor-pointer hover:bg-primary-hover"
-          >
-            Inne Produkty tego Sprzedawcy
-          </button>
+          <div className="flex flex-row gap-3 mt-1.5">
+            <button
+              onClick={() => SameStoreProducts(shop_id)}
+              className="bg-primary text-text-secondary text-sm px-6 py-3 rounded-sm cursor-pointer hover:bg-primary-hover"
+            >
+              Inne Produkty tego Sprzedawcy
+            </button>
+            <MsgButton />
+          </div>
         </div>
       )}
     </div>

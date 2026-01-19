@@ -29,7 +29,6 @@ export default function Login() {
           withCredentials: true,
         }
       );
-
       addToast(res.data?.message, "success");
       await refreshUser();
       reset();
