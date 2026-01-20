@@ -48,7 +48,7 @@ export const getRooms = async (req, res) => {
       return res.status(403).json({ message: "Brak uprawnień" });
     }
     const [rooms] = await promisePool.query(query, params);
-    res.json(rooms); // The original code returned object or array? Original: res.json(rooms). Rooms is array of rows.
+    res.json(rooms);
   } catch (err) {
     console.error("get_rooms error:", err);
     res.status(500).json({ message: "Błąd serwera" });

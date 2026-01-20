@@ -47,9 +47,6 @@ export const getProductData = async (req, res) => {
     );
 
     if (!rows[0] || !rows[0].name) {
-      // Check if product actually found (left join returns row of nulls if p.id matches nothing?) No, where p.id=? should return empty if not found, but GROUP BY aggregation might behave differently. Standard MySQL returns empty if no rows match WHERE.
-      // However, promisePool query returns [rows]. If found rows[0] is object. If not found rows is empty[].
-      // Wait, `rows` from mysql2 is array.
       if (rows.length === 0 || rows[0].name === null)
         return res.status(404).json({ message: "Nie znaleziono produktu" });
     }

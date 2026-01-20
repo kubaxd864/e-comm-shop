@@ -19,7 +19,7 @@ export const contact = async (req, res) => {
     const { name, email, shopId, subject, message } = req.body;
     await transporter.sendMail({
       from: `"Formularz kontaktowy" <jakubsobczyk2004@wp.pl>`,
-      to: process.env.CONTACT_MAIL, // Using env here
+      to: process.env.CONTACT_MAIL,
       replyTo: email,
       subject: `[Kontakt] ${subject}`,
       text: `Imię: ${name} E-mail: ${email}\n\n${message}`,
