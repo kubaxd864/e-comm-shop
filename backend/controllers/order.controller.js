@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const getStripeConfig = (req, res) => {
-  res.send({ publishablekey: env.STRIPE_PUBLIC_KEY });
+  res.send({ publishablekey: process.env.STRIPE_PUBLIC_KEY });
 };
 
 export const createPaymentIntent = async (req, res) => {
