@@ -13,7 +13,7 @@ export default function MessagesBox({
   const [message, setMessage] = useState("");
   const { user } = useUser();
   const { data, mutate } = useSWR(
-    roomId ? `http://localhost:5000/api/messages/${roomId}` : null,
+    roomId ? `http://localhost:5000/api/chat/messages/${roomId}` : null,
     fetcher,
   );
 

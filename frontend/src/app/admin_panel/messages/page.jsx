@@ -25,7 +25,7 @@ export default function Messages() {
   const [roomId, setRoomId] = useState(null);
   const hasJoinedRef = useRef(false);
   const { data, error, isLoading, mutate } = useSWR(
-    "http://localhost:5000/api/get_rooms",
+    "http://localhost:5000/api/chat/get_rooms",
     fetcher,
   );
   const rooms = useMemo(() => data ?? [], [data]);

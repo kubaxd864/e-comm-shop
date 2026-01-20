@@ -9,12 +9,12 @@ export function useCart() {
   const { user } = useUser();
   const { addToast } = useToast();
   const { data, error, mutate, isLoading } = useSWR(
-    !!user ? "http://localhost:5000/api/cart" : null,
+    !!user ? "http://localhost:5000/api/cart/data" : null,
     fetcher,
     {
       revalidateOnFocus: false,
       shouldRetryOnError: false,
-    }
+    },
   );
 
   const items = useMemo(() => data?.items ?? [], [data]);
@@ -23,14 +23,14 @@ export function useCart() {
   const deliverySum = useMemo(() => data?.deliverySum ?? 0, [data]);
   const deliverySelections = useMemo(
     () => data?.deliverySelections ?? {},
-    [data]
+    [data],
   );
 
   async function updateDeliveryPrice(storeId, newPrice) {
     await api.post(
       "http://localhost:5000/api/cart/delivery",
       { storeId, price: newPrice },
-      { withCredentials: true }
+      { withCredentials: true },
     );
     mutate();
   }
@@ -48,7 +48,7 @@ export function useCart() {
   async function lowerQuantity(productId) {
     try {
       const res = await api.post(
-        `http://localhost:5000/api/cart/lowerquantity/${productId}`
+        `http://localhost:5000/api/cart/lowerquantity/${productId}`,
       );
       await mutate();
       addToast(res.data.message, "info");
@@ -60,7 +60,7 @@ export function useCart() {
   async function deleteFromCart(productId) {
     try {
       const res = await api.delete(
-        `http://localhost:5000/api/cart/${productId}`
+        `http://localhost:5000/api/cart/${productId}`,
       );
       await mutate();
       addToast(res.data.message, "info");

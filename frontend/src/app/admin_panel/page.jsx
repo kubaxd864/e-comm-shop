@@ -8,7 +8,7 @@ import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 
 export default function AdminPanel() {
-  const { data } = useSWR(`http://localhost:5000/api/admin_data`, fetcher);
+  const { data } = useSWR(`http://localhost:5000/api/admin/data`, fetcher);
   const weeklyNewUsers = data?.weeklyNewUsers ?? [];
   const weeklysales = data?.weeklysales ?? [];
   const sum = data?.sum[0].total_sum ?? 0;
@@ -17,11 +17,11 @@ export default function AdminPanel() {
   const products = data?.products ?? [];
   const weeklyUsersSum = weeklyNewUsers.reduce(
     (acc, item) => acc + (Number(item?.new_users) || 0),
-    0
+    0,
   );
   const weeklySalesSum = weeklysales.reduce(
     (acc, item) => acc + (Number(item?.items_sold) || 0),
-    0
+    0,
   );
   return (
     <div className="flex flex-1 w-full flex-col px-4 py-10 sm:px-6 md:py-14">

@@ -21,7 +21,7 @@ export default function PaymentStep({ setStep }) {
         colorPrimary: "#1347BE",
       },
     }),
-    [isDark]
+    [isDark],
   );
 
   const elementsOptions = useMemo(
@@ -29,7 +29,7 @@ export default function PaymentStep({ setStep }) {
       clientSecret,
       appearance,
     }),
-    [clientSecret, appearance]
+    [clientSecret, appearance],
   );
 
   useEffect(() => {
@@ -37,17 +37,17 @@ export default function PaymentStep({ setStep }) {
     initialized.current = true;
     async function initStripe() {
       const config = await axios.get(
-        "http://localhost:5000/api/stripe_config",
+        "http://localhost:5000/api/stripe/config",
         {
           withCredentials: true,
-        }
+        },
       );
       setStripePromise(loadStripe(config.data.publishablekey));
       const amount = Math.round((itemsSum + deliverySum) * 100);
       const intent = await axios.post(
         "http://localhost:5000/api/stripe/create-payment-intent",
         { amount },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setClientSecret(intent.data.clientSecret);
     }
