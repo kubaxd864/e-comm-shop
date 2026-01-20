@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { useRouter } from "next/navigation";
-import MsgButton from "./MessageButton";
 
 export default function ProductParameters({
   description,
@@ -17,7 +16,9 @@ export default function ProductParameters({
   const [openedSection, setSection] = useState("Opis");
   const router = useRouter();
   const parametry =
-    typeof parameters === "string" ? JSON.parse(parameters) : parameters ?? {};
+    typeof parameters === "string"
+      ? JSON.parse(parameters)
+      : (parameters ?? {});
   function SameStoreProducts(shopId) {
     if (!shopId) return;
     router.push(`/categories?shop=${shopId}`);
@@ -90,7 +91,6 @@ export default function ProductParameters({
             >
               Inne Produkty tego Sprzedawcy
             </button>
-            <MsgButton />
           </div>
         </div>
       )}

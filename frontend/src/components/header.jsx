@@ -28,7 +28,7 @@ export default function Header() {
       const res = await axios.post(
         "http://localhost:5000/api/auth/logout",
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       await refreshUser(null, { revalidate: false });
       addToast(res.data?.message, "success");
@@ -121,6 +121,9 @@ export default function Header() {
               <Link href={"myorders"}>
                 <p>Moje Zamówienia</p>
               </Link>
+              <Link href={"messages"}>
+                <p>Moje Wiadomości</p>
+              </Link>
               <p onClick={() => logout()}>Wyloguj się</p>
             </div>
           ) : null}
@@ -188,6 +191,9 @@ export default function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <p>Moje Zamówienia</p>
+                </Link>
+                <Link href={"messages"}>
+                  <p>Moje Wiadomości</p>
                 </Link>
                 <button
                   type="button"

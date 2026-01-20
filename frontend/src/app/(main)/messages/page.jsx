@@ -74,7 +74,7 @@ export default function Messages() {
       const targetType = room.context_type ?? room.contextType;
       const targetId = room.context_id ?? room.contextId;
       if (!targetType || targetId === undefined || targetId === null) return;
-      router.push(`/admin_panel/messages?type=${targetType}&id=${targetId}`);
+      router.push(`/messages?type=${targetType}&id=${targetId}`);
     },
     [router],
   );

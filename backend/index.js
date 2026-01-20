@@ -121,35 +121,57 @@ io.on("connection", (socket) => {
     socket.disconnect();
     return;
   }
-  console.log("Socket połączony:", user);
   socket.user = user;
 
-  socket.on("joinOrderChat", async ({ order }) => {
-    const room = await getOrCreateChatRoom(order);
-    socket.join(`order:${room.order_id}`);
+  socket.on("joinOrCreateChat", async ({ type, id }, callback) => {
+    const room = await getOrCreateChatRoom({
+      contextType: type,
+      contextId: id,
+      shopId: socket.handshake.session.shop,
+      userId: socket.handshake.session.userId,
+    });
+    socket.join(`${type}:${id}`);
+    callback?.({ ok: true, roomId: room.id });
   });
 
-  socket.on("sendMessage", async ({ order, content }) => {
-    const room = await getOrCreateChatRoom(order);
+  socket.on("sendMessage", async ({ roomId, text }, callback) => {
+    const [rooms] = await promisePool.query(
+      `SELECT * FROM chat_rooms WHERE id = ?`,
+      [roomId],
+    );
+    const room = rooms[0];
     const message = await createMessage({
       chatRoomId: room.id,
-      senderId: socket.user.id,
-      senderRole: socket.user.role,
-      content,
+      senderId: socket.handshake.session.userId,
+      senderRole: socket.handshake.session.role,
+      text,
     });
-
-    io.to(`order:`).emit("newMessage", message);
+    io.to(roomId).emit("message", { from: socket.id, text: message });
+    callback?.({ ok: true });
   });
 
-  socket.on("disconnect", () => {
-    console.log("Socket rozłączony:", socket.user.id);
-  });
+  socket.on("disconnect", () => {});
+});
+
+app.get("/api/messages/:roomId", async (req, res) => {
+  const { roomId } = req.params;
+  try {
+    const [messages] = await promisePool.query(
+      `SELECT * FROM chat_messages WHERE chat_room_id = ? ORDER BY created_at ASC`,
+      [roomId],
+    );
+    res.json({ ok: true, messages });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, error: "Database error" });
+  }
 });
 
 app.get("/api/get_rooms", requireAuth, async (req, res) => {
   try {
     const role = req.session.role;
     const userId = req.session.userId;
+    const shopId = req.session.shop;
     let query;
     let params;
 
@@ -166,17 +188,18 @@ app.get("/api/get_rooms", requireAuth, async (req, res) => {
         WHERE shop_id = ?
         ORDER BY last_message_at DESC
       `;
-      params = [1];
+      params = [shopId];
     } else if (role === "owner") {
       query = `
-        SELECT * FROM chat_rooms
-        ORDER BY last_message_at DESC
+        SELECT cr.*, u.email AS client_email
+        FROM chat_rooms cr
+        LEFT JOIN users u ON u.id = cr.client_id
+        ORDER BY cr.last_message_at DESC
       `;
-      params = [1];
+      params = [];
     } else {
       return res.status(403).json({ message: "Brak uprawnień" });
     }
-
     const [rooms] = await promisePool.query(query, params);
     res.json(rooms);
   } catch (err) {
@@ -251,6 +274,7 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
       req.session.userId = user.id;
       req.session.email = user.email;
       req.session.role = user.role;
+      req.session.shop = user.assigned_shop;
       req.session.cookie.maxAge = remember_me
         ? rememberMeMaxAge
         : defaultSessionMaxAge;

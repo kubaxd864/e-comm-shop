@@ -11,7 +11,7 @@ cloudinary.config({
 
 async function getUserByEmail(email) {
   const [rows] = await promisePool.query(
-    "SELECT id, email, password_hash, role, is_active FROM users WHERE email = ?",
+    "SELECT id, email, password_hash, role, assigned_shop, is_active FROM users WHERE email = ?",
     [email],
   );
   return rows[0];
@@ -397,51 +397,49 @@ const requireOwner = async (req, res, next) => {
   next();
 };
 
-async function getOrCreateChatRoom(order) {
-  const [rows] = await promisePool.query(
-    `SELECT * FROM chat_rooms WHERE order_id = ?`,
-    [order.id],
-  );
-
-  if (rows.length > 0) return rows[0];
-
-  const [result] = await promisePool.query(
-    `INSERT INTO chat_rooms (order_id, shop_id, client_id)
-     VALUES (?, ?, ?)`,
-    [order.id, order.shop_id, order.user_id],
-  );
-
-  return {
-    id: result.insertId,
-    order_id: order.id,
-    shop_id: order.shop_id,
-    client_id: order.user_id,
-  };
+async function getOrCreateChatRoom({ contextType, contextId, shopId, userId }) {
+  try {
+    const [rows] = await promisePool.query(
+      `SELECT * FROM chat_rooms
+     WHERE context_type = ? AND context_id = ?`,
+      [contextType, contextId],
+    );
+    if (rows.length) return rows[0];
+    const [result] = await promisePool.query(
+      `INSERT INTO chat_rooms
+     (context_type, context_id, shop_id, client_id)
+     VALUES (?, ?, ?, ?)`,
+      [contextType, contextId, shopId, userId],
+    );
+    return {
+      id: result.insertId,
+    };
+  } catch (err) {
+    if (err.code === "ER_DUP_ENTRY") {
+      const [rows] = await promisePool.query(
+        `SELECT * FROM chat_rooms
+         WHERE context_type = ? AND context_id = ?`,
+        [contextType, contextId],
+      );
+      return rows[0];
+    }
+    throw err;
+  }
 }
 
-async function createMessage({ chatRoomId, senderId, senderRole, content }) {
-  const [result] = await promisePool.query(
+async function createMessage({ chatRoomId, senderId, senderRole, text }) {
+  await promisePool.query(
     `INSERT INTO chat_messages
      (chat_room_id, sender_id, sender_role, content)
      VALUES (?, ?, ?, ?)`,
-    [chatRoomId, senderId, senderRole, content],
+    [chatRoomId, senderId, senderRole, text],
   );
-
   await promisePool.query(
     `UPDATE chat_rooms
      SET last_message_at = NOW()
      WHERE id = ?`,
     [chatRoomId],
   );
-
-  return {
-    id: result.insertId,
-    chatRoomId,
-    senderId,
-    senderRole,
-    content,
-    createdAt: new Date(),
-  };
 }
 
 module.exports = {

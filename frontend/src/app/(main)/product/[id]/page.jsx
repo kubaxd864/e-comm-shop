@@ -8,12 +8,13 @@ import Link from "next/link";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { useParams } from "next/navigation";
+import MsgButton from "@/components/MessageButton";
 
 export default function ProductPage() {
   const { id } = useParams();
   const { data } = useSWR(
     `http://localhost:5000/api/get_product/data/${id}`,
-    fetcher
+    fetcher,
   );
   const product = data?.product ?? [];
   const imgs = product?.images ? product.images.split("||") : [];
@@ -24,7 +25,7 @@ export default function ProductPage() {
 
   const { data: SimilarProducts } = useSWR(
     `http://localhost:5000/api/get_simular_products?category_id=${product.category_id}&id=${id}`,
-    fetcher
+    fetcher,
   );
   const simularproducts = SimilarProducts?.products ?? [];
   return (
@@ -69,9 +70,13 @@ export default function ProductPage() {
             </div>
             <div className="flex flex-row justify-between">
               <FavoriteBtn productId={id} />
-              <CartBtn productId={id} />
+              <div className="flex flex-row gap-3">
+                <CartBtn productId={id} />
+                <MsgButton type="product" id={id} />
+              </div>
             </div>
             <ProductParameters
+              id={id}
               description={product?.description}
               parameters={product?.parameters}
               shop_id={product?.shop_id}

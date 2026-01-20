@@ -1,9 +1,12 @@
 "use client";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { fetcher } from "@/lib/fetcher";
 import useSWR from "swr";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBoxOpen } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBoxOpen,
+  faEllipsisVertical,
+} from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 
 const statusStyles = {
@@ -18,6 +21,7 @@ export default function Myorders() {
     "http://localhost:5000/api/my_orders",
     fetcher,
   );
+  const [openMenuId, setOpenMenuId] = useState(null);
   const orders = useMemo(() => data?.orders ?? [], [data]);
   return (
     <main className="flex flex-1 w-full justify-center p-10">
@@ -43,13 +47,37 @@ export default function Myorders() {
                     <FontAwesomeIcon icon={faBoxOpen}></FontAwesomeIcon>
                     Zamówienie #{o.id}{" "}
                   </p>
-                  <span
-                    className={`px-3 py-1 rounded text-xs font-medium capitalize ${
-                      statusStyles[o.status]
-                    }`}
-                  >
-                    {o.status}
-                  </span>
+                  <div className="relative flex flex-row gap-3">
+                    <span
+                      className={`px-3 py-1 rounded text-xs font-medium capitalize ${
+                        statusStyles[o.status]
+                      }`}
+                    >
+                      {o.status}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setOpenMenuId((prev) => (prev === o.id ? null : o.id))
+                      }
+                      className="hover:cursor-pointer"
+                    >
+                      <FontAwesomeIcon icon={faEllipsisVertical} />
+                    </button>
+                    <div
+                      className={`absolute right-0 top-full z-50 mt-2 flex flex-col gap-5 rounded-sm border border-border bg-bg-secondary p-3 text-left text-sm transition-all duration-200 ease-out origin-top transform ${
+                        openMenuId === o.id
+                          ? "scale-y-100 opacity-100 translate-y-0"
+                          : "pointer-events-none scale-y-0 opacity-0 -translate-y-2"
+                      }`}
+                    >
+                      <Link
+                        href={`/messages?type=${"order"}&id=${o.id}`}
+                        className=""
+                      >
+                        Zgłoś problem z zamówieniem
+                      </Link>
+                    </div>
+                  </div>
                 </div>
                 {o?.items?.map((item, idx) => (
                   <div
