@@ -26,7 +26,7 @@ npm run dev
 Następnie przejdź do folderu backend i wpisz aby uruchomić serwer:
 
 ```
-node api.js
+nodemon server.js
 ```
 
 <br/>
