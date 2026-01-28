@@ -32,7 +32,7 @@ export const requireOwner = async (req, res, next) => {
     [req.session.userId],
   );
   if (rows[0]?.role !== "owner") {
-    return res.json({ message: "Brak uprawnień do tej operacji" });
+    return res.status(403).json({ message: "Brak uprawnień do tej operacji" });
   }
   next();
 };
