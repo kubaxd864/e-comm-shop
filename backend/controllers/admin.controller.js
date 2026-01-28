@@ -309,7 +309,7 @@ export const getUsers = async (req, res) => {
     res.json({ users });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Błąd podczas Aktualizacji" });
+    res.status(500).json({ message: "Błąd podczas Pobierania" });
   }
 };
 
@@ -359,7 +359,7 @@ export const addCategory = async (req, res) => {
       "INSERT INTO categories (name, slug, parent_id) VALUES (?, ?, ?)",
       [name, slug, parent_id],
     );
-    res.status(200).json({ message: "Zaktualizowano" });
+    res.status(200).json({ message: "Dodano Kategorię" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Błąd podczas Aktualizacji" });
