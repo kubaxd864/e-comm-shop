@@ -36,11 +36,17 @@ nodemon server.js
 Aby uruchomić unit testy aplikacji, należy przejść do folderu backend i wpisać w terminalu:
 
 ```
-npm test:unit
+npm run test:unit
+```
+
+Aby uruchomić testy api aplikacji, należy przejść do folderu backend i wpisać w terminalu:
+
+```
+npm run test:api
 ```
 
 Aby sprawdzić code coverage, należy wpisać w terminalu:
 
 ```
-npx cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules npx jest __tests__/unit --coverage
+npx cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules npx jest __tests__/ --coverage
 ```
