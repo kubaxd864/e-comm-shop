@@ -77,7 +77,7 @@ export const login = async (req, res) => {
       req.session.cookie.maxAge = remember_me
         ? rememberMeMaxAge
         : defaultSessionMaxAge;
-      return res.json({ message: "Zalogowano Pomyślnie" });
+      return res.status(200).json({ message: "Zalogowano Pomyślnie" });
     });
   } catch (err) {
     console.error(err);
@@ -99,7 +99,7 @@ export const logout = async (req, res) => {
         secure: false,
         httpOnly: true,
       });
-      return res.json({ message: "Wylogowano z Konta" });
+      return res.status(200).json({ message: "Wylogowano z Konta" });
     });
   } catch (err) {
     console.error(err);
