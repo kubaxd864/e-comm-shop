@@ -1,0 +1,66 @@
+config:
+  target: "http://localhost:5000"
+
+  phases:
+    - duration: 10
+      arrivalRate: 100
+      name: "Peak load"
+
+    - duration: 30
+      arrivalRate: 50
+      name: "Sustained load"
+
+  plugins:
+    metrics-by-endpoint: {}
+
+  ensure:
+    thresholds:
+      - http.response_time.p95: 500
+      - http.response_time.p99: 1000
+      - http.errors: 0.01
+
+  payload:
+    path: "data/users.csv"
+    fields:
+      - "email"
+      - "password"
+
+scenarios:
+  - name: "Test endpointu GET /api/products"
+    weight: 3
+    flow:
+      - get:
+          url: "/api/products"
+          capture:
+            - json: "$.data[0].id"
+              as: "productId"
+          expect:
+            - statusCode: 200
+            - contentType: "application/json"
+            - hasProperty: "data"
+
+  - name: "Test endpointu POST /api/orders"
+    weight: 1
+    flow:
+      - post:
+          url: "/api/orders"
+          headers:
+            Authorization: "Bearer {{ token }}"
+            Content-Type: "application/json"
+          json:
+            productId: "{{ productId }}"
+            quantity: 1
+            userId: "{{ $randomNumber(1000, 9999) }}"
+          expect:
+            - statusCode: 201
+            - hasProperty: "orderId"
+
+  - name: "Test endpointu z parametrami"
+    flow:
+      - get:
+          url: "/api/products?category=electronics&limit=10"
+          qs:
+            page: 1
+            sort: "price"
+          expect:
+            - statusCode: 200
