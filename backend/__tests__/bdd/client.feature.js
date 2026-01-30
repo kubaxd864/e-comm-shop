@@ -40,6 +40,10 @@ jest.unstable_mockModule("bcrypt", () => ({
   },
 }));
 
+jest.unstable_mockModule("../../config/stripe.js", () => ({
+  stripe: {},
+}));
+
 const { default: app } = await import("../../index.js");
 const feature = loadFeature("./__tests__/bdd/features/client.feature");
 

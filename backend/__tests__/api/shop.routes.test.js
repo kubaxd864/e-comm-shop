@@ -47,6 +47,10 @@ jest.unstable_mockModule("../../functions/auth.functions.js", () => ({
   requireOwner: jest.fn((req, res, next) => next()),
 }));
 
+jest.unstable_mockModule("../../config/stripe.js", () => ({
+  stripe: {},
+}));
+
 const { default: app } = await import("../../index.js");
 
 describe("Shop API Routes", () => {

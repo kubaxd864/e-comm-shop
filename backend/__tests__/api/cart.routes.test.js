@@ -53,6 +53,10 @@ jest.unstable_mockModule("../../functions/cart.functions.js", () => ({
   getPrices: jest.fn(),
 }));
 
+jest.unstable_mockModule("../../config/stripe.js", () => ({
+  stripe: {},
+}));
+
 const { default: app } = await import("../../index.js");
 const { buildCartSummary } = await import("../../functions/cart.functions.js");
 

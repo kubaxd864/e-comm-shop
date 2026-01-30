@@ -41,6 +41,10 @@ jest.unstable_mockModule("bcrypt", () => ({
   },
 }));
 
+jest.unstable_mockModule("../../config/stripe.js", () => ({
+  stripe: {},
+}));
+
 const { default: app } = await import("../../index.js");
 const { getUserByEmail } = await import("../../functions/auth.functions.js");
 
