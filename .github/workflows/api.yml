@@ -1,4 +1,4 @@
-name: API & BDD Tests
+name: API Tests
 
 on:
   push:

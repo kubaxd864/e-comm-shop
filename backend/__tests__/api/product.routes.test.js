@@ -26,6 +26,10 @@ jest.unstable_mockModule("../../functions/product.functions.js", () => ({
   fetchStores: mockFetchStores,
 }));
 
+jest.unstable_mockModule("../../config/stripe.js", () => ({
+  stripe: {},
+}));
+
 const { default: app } = await import("../../index.js");
 
 describe("Product API Routes", () => {

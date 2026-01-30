@@ -43,6 +43,10 @@ jest.unstable_mockModule("../../config/session.js", () => ({
   rememberMeMaxAge: 2000,
 }));
 
+jest.unstable_mockModule("../../config/stripe.js", () => ({
+  stripe: {},
+}));
+
 const { default: app } = await import("../../index.js");
 
 describe("Admin API Routes", () => {

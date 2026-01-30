@@ -48,7 +48,20 @@ describe("Cart Functions", () => {
   });
 
   describe("getToken", () => {
+    const originalEnv = process.env;
+
+    beforeEach(() => {
+      jest.resetModules();
+      process.env = { ...originalEnv };
+    });
+
+    afterAll(() => {
+      process.env = originalEnv;
+    });
+
     it("should fetch token from external API", async () => {
+      process.env.EPAKA_CLIENT_ID = "test_client_id";
+      process.env.EPAKA_CLIENT_SECRET = "test_client_secret";
       mockPost.mockResolvedValueOnce({
         data: { access_token: "test_token_123" },
       });
@@ -56,7 +69,7 @@ describe("Cart Functions", () => {
       expect(token).toBe("test_token_123");
       expect(mockPost).toHaveBeenCalledWith(
         "https://api.epaka.pl/oauth/token",
-        expect.stringContaining("client_id="),
+        expect.stringContaining("client_id=test_client_id"),
         expect.objectContaining({
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
         }),
