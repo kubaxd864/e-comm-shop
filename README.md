@@ -45,6 +45,12 @@ Aby uruchomić testy api aplikacji, należy przejść do folderu backend i wpisa
 npm run test:api
 ```
 
+Aby uruchomić testy bdd aplikacji, należy przejść do folderu backend i wpisać w terminalu:
+
+```
+npm run test:bdd
+```
+
 Aby sprawdzić code coverage, należy wpisać w terminalu:
 
 ```
