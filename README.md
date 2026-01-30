@@ -51,6 +51,24 @@ Aby uruchomić testy bdd aplikacji, należy przejść do folderu backend i wpisa
 npm run test:bdd
 ```
 
+Aby uruchomić testy performace aplikacji, należy stworzyć 2 terminale i w pierwzym uruchomić serwer wpisując:
+
+```
+node server.js
+```
+
+W drugim terminalu należy przejść do folderu backend i wpisać w terminalu:
+
+```
+npm run test:performance
+```
+
+Aby uruchomić wszystkie testy, należy przejść do folderu backend i wpisać w terminalu:
+
+```
+npm run test:all
+```
+
 Aby sprawdzić code coverage, należy wpisać w terminalu:
 
 ```

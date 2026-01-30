@@ -16,7 +16,7 @@
     "test:performance": "artillery run __tests__/performance/scenarios/api-load-test.yml --output __tests__/performance/reports/report.json",
     "test:performance:ci": "artillery run __tests__/performance/scenarios/api-load-test.yml --output __tests__/performance/reports/report.json && artillery report __tests__/performance/reports/report.json --output __tests__/performance/reports/report.html",
     "test:performance:quick": "artillery quick --count 100 -n 50 http://localhost:3000/api/health",
-    "test:all": "npm run test:unit && npm run test:integration && npm run test:bdd && npm run test:e2e",
+    "test:all": "npm run test:unit && npm run test:api && npm run test:bdd && npm run test:performance",
     "pretest": "echo 'Preparing test environment...'",
     "posttest": "echo 'Tests completed'"
   },
