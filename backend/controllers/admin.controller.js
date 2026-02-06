@@ -1,4 +1,5 @@
 import { promisePool } from "../config/db.js";
+import axios from "axios";
 import {
   fetchOrders,
   fetchLatestProducts,
@@ -377,5 +378,35 @@ export const updateCategoryStatus = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Błąd podczas Aktualizacji" });
+  }
+};
+
+export const getChatResponse = async (req, res) => {
+  try {
+    const { prompt } = req.query;
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const response = await axios.post(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`,
+          {
+            contents: [
+              {
+                parts: [{ text: prompt }],
+              },
+            ],
+          },
+        );
+        const generatedText = response.data.candidates[0].content.parts[0].text;
+        return res.status(200).json({ content: generatedText });
+      } catch (geminiError) {
+        console.error(
+          "Gemini API Error:",
+          geminiError.response?.data || geminiError.message,
+        );
+      }
+    }
+  } catch (error) {
+    console.error("Server Error:", error);
+    res.status(500).json({ message: "Błąd serwera" });
   }
 };

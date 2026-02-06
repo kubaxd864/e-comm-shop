@@ -1,15 +1,18 @@
 "use client";
 import React from "react";
 import CategoryOption from "@/components/CategoryOption";
+import ChatButton from "./ChatButton";
+import { useState } from "react";
 
 export default function ProductDetailsForm({ form, categories, shops }) {
   const {
     register,
     formState: { errors },
     watch,
+    getValues,
   } = form;
   const selectedCategory = watch("category");
-
+  const [parameters, setParameters] = useState("");
   return (
     <div className="flex flex-col gap-4 p-2">
       <div className="flex flex-col gap-2">
@@ -186,15 +189,24 @@ export default function ProductDetailsForm({ form, categories, shops }) {
       </div>
       <div className="flex flex-col gap-5">
         <h2 className="text-xl font-semibold">Parametry Produktu</h2>
-        <textarea
-          rows={6}
-          placeholder="Parametry produktu np. Marka: Sony, Model:Vaio"
-          className="border border-border p-3 rounded-sm"
-          {...register("parameters", {
-            required: "Podaj parametry produktu",
-            minLength: { value: 10, message: "Podaj parametry Produktu" },
-          })}
-        />
+        <div className="flex w-full relative">
+          <textarea
+            rows={6}
+            value={parameters}
+            placeholder="Parametry produktu np. Marka: Sony, Model:Vaio"
+            className="border border-border p-3 rounded-sm w-full"
+            {...register("parameters", {
+              required: "Podaj parametry produktu",
+              minLength: { value: 10, message: "Podaj parametry Produktu" },
+            })}
+          />
+          <ChatButton
+            getValues={getValues}
+            prompt={`Wygeneruj 8 parametrów które zapiszesz w formacie wypisując je po przecinku tak jak tutaj: Marka: text, Model:text, odnoszące się do realnych cech produktu takich jak kolor, 
+              stan czy inne przydatne parametry w zależności od kategorii którą sprawdź w zależności od nazwy produktu dla produktu o takich parametrach`}
+            setParameters={setParameters}
+          />
+        </div>
         {errors.parameters && (
           <p className="text-sm text-red-400">{errors.parameters.message}</p>
         )}

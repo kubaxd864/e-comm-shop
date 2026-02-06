@@ -12,6 +12,7 @@ import {
   updatePrivilages,
   addCategory,
   updateCategoryStatus,
+  getChatResponse,
 } from "../controllers/admin.controller.js";
 import { upload } from "../config/multer.js";
 import { requireAdmin, requireOwner } from "../functions/auth.functions.js";
@@ -35,5 +36,6 @@ router.put("/update_user_status", requireAdmin, updateUserStatus);
 router.put("/update_privilages", requireOwner, updatePrivilages);
 router.post("/add_category", requireAdmin, addCategory);
 router.put("/update_category_status", requireAdmin, updateCategoryStatus);
+router.get("/get_chat_response", requireAdmin, getChatResponse);
 
 export default router;

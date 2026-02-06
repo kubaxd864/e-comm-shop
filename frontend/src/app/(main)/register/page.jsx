@@ -33,7 +33,7 @@ export default function Register() {
         data,
         {
           withCredentials: true,
-        }
+        },
       );
       addToast(res.data.message, "success");
       reset();
@@ -46,7 +46,7 @@ export default function Register() {
       <div className="flex flex-col bg-bg-secondary items-center gap-6 text-center rounded-sm p-8 sm:p-16 m-10">
         <h2 className="text-3xl p-2">Zarejestruj Nowe Konto</h2>
         <form
-          onSubmit={isSubmitSuccessful ? null : handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(onSubmit)}
           className="flex flex-col justify-center items-center gap-2"
         >
           <TextField
@@ -353,8 +353,8 @@ export default function Register() {
               {isSubmitSuccessful
                 ? "Zarejestrowano"
                 : isSubmitting
-                ? "Rejestrowanie.."
-                : "Zarejestruj Się"}
+                  ? "Rejestrowanie.."
+                  : "Zarejestruj Się"}
             </button>
           </div>
         </form>

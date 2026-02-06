@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ToastProvider";
 import { useUser } from "@/hooks/useUser";
 import { useIsDark } from "@/hooks/useIsDark";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
 
 export default function Login() {
   const { addToast } = useToast();
@@ -17,7 +19,7 @@ export default function Login() {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting, isSubmitSuccessful },
+    formState: { errors, isSubmitting },
   } = useForm();
 
   async function onSubmit(data) {
@@ -27,7 +29,7 @@ export default function Login() {
         data,
         {
           withCredentials: true,
-        }
+        },
       );
       addToast(res.data?.message, "success");
       await refreshUser();
@@ -41,10 +43,7 @@ export default function Login() {
     <main className="flex flex-1 w-full flex-col items-center justify-center">
       <div className="flex flex-col bg-bg-secondary items-center gap-6 text-center rounded-sm p-10 sm:p-16 m-10">
         <h2 className="text-3xl p-2">Zaloguj Się do Konta</h2>
-        <form
-          onSubmit={isSubmitSuccessful ? null : handleSubmit(onSubmit)}
-          className="flex flex-col gap-2"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
           <TextField
             id="email"
             label="E-mail"
